@@ -1,0 +1,19 @@
+# Git Log Analyzer Configuration Example
+# Copy this file to ~/.git-log-analyzer.yaml and modify as needed
+
+# Default repository path
+repo: "./"
+
+# Enable AI analysis by default
+ai: false
+
+# Default output file (empty means stdout)
+output: ""
+
+# AI Configuration (can also be set via environment variables)
+ai_config:
+  endpoint: "https://api.openai.com/v1/chat/completions"
+  model: "gpt-3.5-turbo"
+  max_tokens: 2000
+  temperature: 0.7
+  # api_key should be set via AI_API_KEY environment variable for security

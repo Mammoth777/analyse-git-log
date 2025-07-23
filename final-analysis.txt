@@ -1,0 +1,25 @@
+=== Git Repository Analysis Report ===
+
+Total Commits: 6
+Active Period: 2025-07-23 to 2025-07-23
+Active Days: 1
+Active Weeks: 1
+Active Months: 1
+
+=== Top Contributors ===
+1. houjiaqi: 6 commits (+1684/-0 lines)
+
+=== Most Active Hours ===
+16:00 - 6 commits
+
+=== Most Modified Files ===
+README.md: 2 modifications
+Makefile: 2 modifications
+go.sum: 1 modifications
+demo.sh: 1 modifications
+internal/analyzer/analyzer_test.go: 1 modifications
+go.mod: 1 modifications
+internal/git/git_test.go: 1 modifications
+internal/analyzer/analyzer.go: 1 modifications
+internal/git/git.go: 1 modifications
+.git-log-analyzer.yaml.example: 1 modifications

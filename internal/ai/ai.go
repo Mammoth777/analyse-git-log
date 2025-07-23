@@ -74,6 +74,48 @@ func NewAIClient() (*AIClient, error) {
 	}, nil
 }
 
+// NewAIClientWithConfig creates a new AI client with custom configuration
+func NewAIClientWithConfig(config AIConfig) (*AIClient, error) {
+	if config.APIKey == "" {
+		return nil, fmt.Errorf("API key is required")
+	}
+
+	// Set defaults if not provided
+	if config.APIEndpoint == "" {
+		config.APIEndpoint = "https://api.openai.com/v1/chat/completions"
+	}
+	if config.Model == "" {
+		config.Model = "gpt-3.5-turbo"
+	}
+	if config.MaxTokens == 0 {
+		config.MaxTokens = 2000
+	}
+	if config.Temperature == 0 {
+		config.Temperature = 0.7
+	}
+
+	return &AIClient{
+		config: config,
+		client: &http.Client{
+			Timeout: 30 * time.Second,
+		},
+	}, nil
+}
+
+// ValidateConfig validates AI configuration
+func ValidateConfig(config AIConfig) error {
+	if config.APIKey == "" {
+		return fmt.Errorf("API key is required")
+	}
+	if config.MaxTokens < 100 || config.MaxTokens > 8000 {
+		return fmt.Errorf("max tokens should be between 100 and 8000")
+	}
+	if config.Temperature < 0.0 || config.Temperature > 2.0 {
+		return fmt.Errorf("temperature should be between 0.0 and 2.0")
+	}
+	return nil
+}
+
 // AnalyzeWithAI performs AI-powered analysis of git statistics
 func (c *AIClient) AnalyzeWithAI(stats *analyzer.Statistics, basicReport string) (string, error) {
 	prompt := c.buildAnalysisPrompt(stats, basicReport)

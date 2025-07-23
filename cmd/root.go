@@ -3,19 +3,24 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	
-	"git-log-analyzer/internal/analyzer"
+
 	"git-log-analyzer/internal/ai"
+	"git-log-analyzer/internal/analyzer"
 	"git-log-analyzer/internal/git"
+	"git-log-analyzer/internal/report"
 )
 
 var cfgFile string
 var repoPath string
 var useAI bool
 var outputFile string
+var generateWeb bool
+var outputDir string
+var openBrowser bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -55,12 +60,18 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.git-log-analyzer.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&repoPath, "repo", "r", "./", "path to git repository")
 	rootCmd.PersistentFlags().BoolVar(&useAI, "ai", false, "enable AI-powered analysis")
-	rootCmd.PersistentFlags().StringVarP(&outputFile, "output", "o", "", "output file for the report")
+	rootCmd.PersistentFlags().StringVarP(&outputFile, "output", "o", "", "output file for the text report")
+	rootCmd.PersistentFlags().BoolVar(&generateWeb, "web", true, "generate web-based HTML report")
+	rootCmd.PersistentFlags().StringVar(&outputDir, "output-dir", getEnv("REPORT_OUTPUT_DIR", "./analysis-reports"), "output directory for reports")
+	rootCmd.PersistentFlags().BoolVar(&openBrowser, "open", getEnvBool("AUTO_OPEN_BROWSER", false), "automatically open web report in browser")
 
 	// Bind flags to viper
 	viper.BindPFlag("repo", rootCmd.PersistentFlags().Lookup("repo"))
 	viper.BindPFlag("ai", rootCmd.PersistentFlags().Lookup("ai"))
 	viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output"))
+	viper.BindPFlag("web", rootCmd.PersistentFlags().Lookup("web"))
+	viper.BindPFlag("output-dir", rootCmd.PersistentFlags().Lookup("output-dir"))
+	viper.BindPFlag("open", rootCmd.PersistentFlags().Lookup("open"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -105,6 +116,7 @@ func analyzeGitLog(repoPath string) error {
 	basicReport := stats.GenerateReport()
 	
 	var finalReport string
+	var aiAnalysis string
 	
 	// AI analysis if enabled
 	if useAI {
@@ -115,12 +127,13 @@ func analyzeGitLog(repoPath string) error {
 			fmt.Println("Continuing with basic analysis only...")
 			finalReport = basicReport
 		} else {
-			aiAnalysis, err := aiClient.AnalyzeWithAI(stats, basicReport)
+			aiResult, err := aiClient.AnalyzeWithAI(stats, basicReport)
 			if err != nil {
 				fmt.Printf("Warning: AI analysis failed: %v\n", err)
 				fmt.Println("Continuing with basic analysis only...")
 				finalReport = basicReport
 			} else {
+				aiAnalysis = aiResult
 				finalReport = basicReport + "\n\n=== AI-Powered Analysis ===\n" + aiAnalysis
 			}
 		}
@@ -128,16 +141,67 @@ func analyzeGitLog(repoPath string) error {
 		finalReport = basicReport
 	}
 	
-	// Output results
+	// Generate web report
+	if generateWeb {
+		fmt.Println("Generating web report...")
+		webGen := report.NewWebReportGenerator(outputDir)
+		projectName := filepath.Base(repoPath)
+		if projectName == "." || projectName == "" {
+			projectName = "Current Repository"
+		}
+		
+		err := webGen.GenerateReport(stats, aiAnalysis, projectName)
+		if err != nil {
+			fmt.Printf("Warning: Failed to generate web report: %v\n", err)
+		} else {
+			reportPath := webGen.GetReportPath()
+			fmt.Printf("Web report generated: %s\n", reportPath)
+			
+			if openBrowser {
+				openWebReport(reportPath)
+			}
+		}
+	}
+	
+	// Output text results
 	if outputFile != "" {
 		err := os.WriteFile(outputFile, []byte(finalReport), 0644)
 		if err != nil {
 			return fmt.Errorf("failed to write output file: %v", err)
 		}
-		fmt.Printf("Report saved to: %s\n", outputFile)
+		fmt.Printf("Text report saved to: %s\n", outputFile)
 	} else {
 		fmt.Println(finalReport)
 	}
 	
 	return nil
+}
+
+// openWebReport opens the web report in the default browser
+func openWebReport(reportPath string) {
+	absPath, err := filepath.Abs(reportPath)
+	if err != nil {
+		fmt.Printf("Warning: Could not get absolute path for report: %v\n", err)
+		return
+	}
+	
+	fmt.Printf("Opening web report in browser: file://%s\n", absPath)
+	// Note: This is a simplified version. In a real implementation,
+	// you might want to use a library like "github.com/pkg/browser"
+}
+
+// getEnv gets environment variable with default value
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+// getEnvBool gets environment variable as boolean with default value
+func getEnvBool(key string, defaultValue bool) bool {
+	if value := os.Getenv(key); value != "" {
+		return value == "true" || value == "1" || value == "yes"
+	}
+	return defaultValue
 }

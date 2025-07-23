@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"git-log-analyzer/cmd"
+	"os"
 )
 
 func main() {

@@ -128,3 +128,5 @@ help:
 	@echo "  check        - Run all code quality checks"
 	@echo "  release      - Prepare release artifacts"
 	@echo "  help         - Show this help"
+# Build optimization flags
+go build -ldflags "-w -s" -o git-log-analyzer

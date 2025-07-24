@@ -45,15 +45,16 @@ type Messages struct {
 	AIPromptTemplate        string
 	AISystemMessage         string
 	AIAnalysisTitle         string
+	AIAnalysisSubtitle      string
 }
 
 // translations contains all language translations
 var translations = map[Language]*Messages{
 	LangZH: {
-		ReportTitle:             "=== Git 仓库分析报告 ===",
-		TopContributors:         "=== 主要贡献者 ===",
-		MostActiveHours:         "=== 最活跃时间 ===",
-		MostModifiedFiles:       "=== 修改最多的文件 ===",
+		ReportTitle:             "Git 仓库分析报告",
+		TopContributors:         "主要贡献者",
+		MostActiveHours:         "最活跃时间",
+		MostModifiedFiles:       "修改最多的文件",
 		
 		TotalCommits:            "总提交数",
 		ActivePeriod:            "活跃周期",
@@ -94,13 +95,14 @@ var translations = map[Language]*Messages{
 
 		AISystemMessage: "你是一位专业的软件开发分析师。请分析Git仓库数据并提供可行的见解。请用中文回答。",
 		AIAnalysisTitle: "AI 分析结果",
+		AIAnalysisSubtitle: "基于Git数据的智能分析",
 	},
 	
 	LangEN: {
-		ReportTitle:             "=== Git Repository Analysis Report ===",
-		TopContributors:         "=== Top Contributors ===",
-		MostActiveHours:         "=== Most Active Hours ===",
-		MostModifiedFiles:       "=== Most Modified Files ===",
+		ReportTitle:             "Git Repository Analysis Report",
+		TopContributors:         "Top Contributors",
+		MostActiveHours:         "Most Active Hours",
+		MostModifiedFiles:       "Most Modified Files",
 		
 		TotalCommits:            "Total Commits",
 		ActivePeriod:            "Active Period",
@@ -141,6 +143,7 @@ Focus on actionable insights that can help improve the development process.`,
 
 		AISystemMessage: "You are an expert software development analyst. Analyze git repository data and provide actionable insights.",
 		AIAnalysisTitle: "AI Analysis Results",
+		AIAnalysisSubtitle: "Intelligent Analysis Based on Git Data",
 	},
 }
 

@@ -344,6 +344,335 @@ body {
     background: #a8a8a8;
 }
 
+/* 代码健康分析样式 */
+.code-health-section {
+    background: white;
+    margin: 30px 0;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.health-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 15px;
+}
+
+.health-header h2 {
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin: 0;
+}
+
+.health-score {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.score-label {
+    font-size: 1.1em;
+    color: #666;
+    font-weight: 500;
+}
+
+.score-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.health-summary {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border-left: 4px solid #28a745;
+}
+
+.health-summary p {
+    margin: 0;
+    font-size: 1.1em;
+    color: #495057;
+    line-height: 1.6;
+}
+
+.health-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.health-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.health-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.health-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f2f5;
+    cursor: default;
+}
+
+.health-card .card-icon {
+    font-size: 1.3em;
+    margin-right: 10px;
+}
+
+.health-card .card-title {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1em;
+    flex: 1;
+}
+
+.health-card .card-count {
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.health-card .card-content {
+    padding: 0;
+    max-height: none;
+    overflow: visible;
+}
+
+/* 技术债务热点 */
+.tech-debt .card-count {
+    background: #dc3545;
+}
+
+.hotspot-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.hotspot-item:last-child {
+    border-bottom: none;
+}
+
+.hotspot-file {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.hotspot-details {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.risk-score {
+    background: #fff5f5;
+    color: #dc3545;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.mod-count {
+    background: #f0f8ff;
+    color: #0066cc;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+.reason {
+    background: #fffbf0;
+    color: #d69e2e;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* 重构信号 */
+.refactor .card-count {
+    background: #fd7e14;
+}
+
+.signal-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.signal-item:last-child {
+    border-bottom: none;
+}
+
+.signal-file {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.signal-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.signal-strength {
+    background: #fff2e6;
+    color: #fd7e14;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.changes-count {
+    background: #e6f7ff;
+    color: #1890ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+.time-window {
+    background: #f6ffed;
+    color: #52c41a;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* 代码集中度问题 */
+.concentration .card-count {
+    background: #ffc107;
+    color: #212529;
+}
+
+.concentration-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.concentration-item:last-child {
+    border-bottom: none;
+}
+
+.concentration-file {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.concentration-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.concentration-level {
+    background: #fff8e1;
+    color: #f57c00;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.change-ratio {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+.total-changes {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* 稳定性指标 */
+.stability .card-count {
+    background: #17a2b8;
+}
+
+.stability-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.stability-item:last-child {
+    border-bottom: none;
+}
+
+.stability-file {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.stability-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stability-level {
+    background: #e0f7fa;
+    color: #00695c;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.shake-index {
+    background: #fff8e1;
+    color: #f57c00;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+.time-spread {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
 .content-loading {
     color: #6c757d;
     font-style: italic;

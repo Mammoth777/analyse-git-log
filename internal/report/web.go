@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"git-log-analyzer/internal/analyzer"
+	"git-log-analyzer/internal/health"
 	"git-log-analyzer/internal/i18n"
 )
 
@@ -37,17 +38,18 @@ func NewWebReportGenerator(outputDir string) *WebReportGenerator {
 
 // ReportData contains all data for web report
 type ReportData struct {
-	GeneratedAt      time.Time
-	ProjectName      string
-	Stats            *analyzer.Statistics
-	TopAuthors       []AuthorData
-	HourlyData       []HourData
-	DailyData        []DayData
-	FileData         []FileData
-	CommitTimeline   []TimelineData
-	AIAnalysis       string
-	Messages         *i18n.Messages
-	Language         i18n.Language
+	GeneratedAt       time.Time
+	ProjectName       string
+	Stats             *analyzer.Statistics
+	TopAuthors        []AuthorData
+	HourlyData        []HourData
+	DailyData         []DayData
+	FileData          []FileData
+	CommitTimeline    []TimelineData
+	AIAnalysis        string
+	CodeHealthMetrics *health.CodeHealthMetrics
+	Messages          *i18n.Messages
+	Language          i18n.Language
 }
 
 // AuthorData represents author statistics for web display
@@ -117,12 +119,13 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 	msg := i18n.GetMessages(lang)
 	
 	data := &ReportData{
-		GeneratedAt:    time.Now(),
-		ProjectName:    projectName,
-		Stats:          stats,
-		AIAnalysis:     aiAnalysis,
-		Messages:       msg,
-		Language:       lang,
+		GeneratedAt:       time.Now(),
+		ProjectName:       projectName,
+		Stats:             stats,
+		AIAnalysis:        aiAnalysis,
+		CodeHealthMetrics: stats.CodeHealthMetrics,
+		Messages:          msg,
+		Language:          lang,
 	}
 
 	// Prepare top authors
@@ -233,6 +236,35 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
 				return template.JS("{}")
 			}
 			return template.JS(string(bytes))
+		},
+		"slice": func(items interface{}, start, end int) interface{} {
+			switch v := items.(type) {
+			case []health.TechnicalDebtHotspot:
+				if end > len(v) {
+					end = len(v)
+				}
+				return v[start:end]
+			case []health.RefactoringSignal:
+				if end > len(v) {
+					end = len(v)
+				}
+				return v[start:end]
+			case []health.CodeConcentrationIssue:
+				if end > len(v) {
+					end = len(v)
+				}
+				return v[start:end]
+			case []health.StabilityIndicator:
+				if end > len(v) {
+					end = len(v)
+				}
+				return v[start:end]
+			default:
+				return items
+			}
+		},
+		"mul": func(a, b float64) float64 {
+			return a * b
 		},
 	}
 

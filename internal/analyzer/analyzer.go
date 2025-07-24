@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"git-log-analyzer/internal/git"
+	"git-log-analyzer/internal/health"
 	"git-log-analyzer/internal/i18n"
 )
 
@@ -16,6 +17,7 @@ type Statistics struct {
 	TimeStats        *TimeStat
 	FileStats        map[string]int
 	CommitFrequency  map[string]int // date -> count
+	CodeHealthMetrics *health.CodeHealthMetrics // 代码健康分析
 }
 
 // AuthorStat contains statistics for a single author
@@ -83,6 +85,10 @@ func (a *Analyzer) Analyze() (*Statistics, error) {
 
 	// Calculate time statistics
 	a.calculateTimeStats(commits, stats.TimeStats)
+
+	// Perform code health analysis
+	healthAnalyzer := health.NewCodeHealthAnalyzer(commits)
+	stats.CodeHealthMetrics = healthAnalyzer.AnalyzeCodeHealth()
 
 	return stats, nil
 }
@@ -258,6 +264,50 @@ func (stats *Statistics) GenerateReport() string {
 			break
 		}
 		report += fmt.Sprintf("%s: %d %s\n", f.file, f.count, msg.Modifications)
+	}
+
+	// Add code health analysis
+	if stats.CodeHealthMetrics != nil {
+		report += "\n\n=== 代码健康分析 ===\n"
+		report += stats.CodeHealthMetrics.HealthSummary + "\n\n"
+		
+		// Technical debt hotspots
+		if len(stats.CodeHealthMetrics.TechnicalDebtHotspots) > 0 {
+			report += "技术债务热点:\n"
+			for i, hotspot := range stats.CodeHealthMetrics.TechnicalDebtHotspots {
+				if i >= 5 { // Top 5
+					break
+				}
+				report += fmt.Sprintf("%d. %s (风险分数: %.2f, 修改次数: %d, 原因: %s)\n",
+					i+1, hotspot.FilePath, hotspot.RiskScore, hotspot.ModificationFreq, hotspot.Reason)
+			}
+			report += "\n"
+		}
+		
+		// Refactoring signals
+		if len(stats.CodeHealthMetrics.RefactoringSignals) > 0 {
+			report += "重构信号:\n"
+			for i, signal := range stats.CodeHealthMetrics.RefactoringSignals {
+				if i >= 5 { // Top 5
+					break
+				}
+				report += fmt.Sprintf("%d. %s (%s信号, %d次修改在%d天内)\n",
+					i+1, signal.FilePath, signal.RefactoringSignal, signal.ShortTermChanges, signal.IntensiveModDays)
+			}
+			report += "\n"
+		}
+		
+		// Code concentration issues
+		if len(stats.CodeHealthMetrics.CodeConcentrationIssues) > 0 {
+			report += "代码集中度问题:\n"
+			for i, issue := range stats.CodeHealthMetrics.CodeConcentrationIssues {
+				if i >= 3 { // Top 3
+					break
+				}
+				report += fmt.Sprintf("%d. %s (%s, 占总变更%.1f%%, %d次修改)\n",
+					i+1, issue.FilePath, issue.ConcentrationLevel, issue.ChangeRatio*100, issue.TotalChanges)
+			}
+		}
 	}
 
 	return report

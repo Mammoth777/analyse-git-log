@@ -37,6 +37,112 @@
             </div>
         </div>
 
+        {{if .CodeHealthMetrics}}
+        <div class="code-health-section">
+            <div class="health-header">
+                <h2>🏥 代码健康分析</h2>
+                <div class="health-score">
+                    <span class="score-label">健康评分:</span>
+                    <span class="score-value">{{printf "%.0f" (mul .CodeHealthMetrics.HealthScore 100)}}/100</span>
+                </div>
+            </div>
+
+            <div class="health-summary">
+                <p>{{.CodeHealthMetrics.HealthSummary}}</p>
+            </div>
+
+            <div class="health-cards">
+                {{if .CodeHealthMetrics.TechnicalDebtHotspots}}
+                <div class="health-card tech-debt">
+                    <div class="card-header">
+                        <span class="card-icon">🔥</span>
+                        <span class="card-title">技术债务热点</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.TechnicalDebtHotspots}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.TechnicalDebtHotspots 0 5}}
+                        <div class="hotspot-item">
+                            <div class="hotspot-file">{{.FilePath}}</div>
+                            <div class="hotspot-details">
+                                <span class="risk-score">风险: {{printf "%.2f" .RiskScore}}</span>
+                                <span class="mod-count">修改: {{.ModificationFreq}}次</span>
+                                <span class="reason">{{.Reason}}</span>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+
+                {{if .CodeHealthMetrics.RefactoringSignals}}
+                <div class="health-card refactor">
+                    <div class="card-header">
+                        <span class="card-icon">🔧</span>
+                        <span class="card-title">重构信号</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.RefactoringSignals}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.RefactoringSignals 0 5}}
+                        <div class="signal-item">
+                            <div class="signal-file">{{.FilePath}}</div>
+                            <div class="signal-details">
+                                <span class="signal-strength">{{.RefactoringSignal}}信号</span>
+                                <span class="changes-count">{{.ShortTermChanges}}次修改</span>
+                                <span class="time-window">{{.IntensiveModDays}}天内</span>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+
+                {{if .CodeHealthMetrics.CodeConcentrationIssues}}
+                <div class="health-card concentration">
+                    <div class="card-header">
+                        <span class="card-icon">⚠️</span>
+                        <span class="card-title">代码集中度问题</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.CodeConcentrationIssues}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.CodeConcentrationIssues 0 3}}
+                        <div class="concentration-item">
+                            <div class="concentration-file">{{.FilePath}}</div>
+                            <div class="concentration-details">
+                                <span class="concentration-level">{{.ConcentrationLevel}}</span>
+                                <span class="change-ratio">{{printf "%.1f" (mul .ChangeRatio 100)}}%</span>
+                                <span class="total-changes">{{.TotalChanges}}次修改</span>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+
+                {{if .CodeHealthMetrics.StabilityIndicators}}
+                <div class="health-card stability">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <span class="card-title">稳定性指标</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.StabilityIndicators}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.StabilityIndicators 0 5}}
+                        <div class="stability-item">
+                            <div class="stability-file">{{.FilePath}}</div>
+                            <div class="stability-details">
+                                <span class="stability-level">{{.StabilityLevel}}</span>
+                                <span class="shake-index">震荡: {{printf "%.2f" .ShakeIndex}}</span>
+                                <span class="time-spread">时长: {{printf "%.0f" .TimeSpread}}天</span>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
         {{if .AIAnalysis}}
         <div class="ai-analysis-section">
             <div class="ai-header">

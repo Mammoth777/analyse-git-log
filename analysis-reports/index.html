@@ -14,14 +14,14 @@
             <h1>Git 仓库分析报告</h1>
             <div class="subtitle">
                 <h2>Current Repository</h2>
-                <p>生成时间 2025-07-24 16:58:44</p>
+                <p>生成时间 2025-07-24 17:24:29</p>
             </div>
         </header>
 
         <div class="summary">
             <div class="stat-card">
                 <h3>总提交数</h3>
-                <div class="stat-number">10</div>
+                <div class="stat-number">11</div>
             </div>
             <div class="stat-card">
                 <h3>贡献者</h3>
@@ -36,6 +36,32 @@
                 <div class="stat-text">2025-07-23 to 2025-07-24</div>
             </div>
         </div>
+
+        
+        <div class="code-health-section">
+            <div class="health-header">
+                <h2>🏥 代码健康分析</h2>
+                <div class="health-score">
+                    <span class="score-label">健康评分:</span>
+                    <span class="score-value">100/100</span>
+                </div>
+            </div>
+
+            <div class="health-summary">
+                <p>代码健康等级：健康 (100.00分) - 代码质量良好，维护性强。发现0个技术债务热点，0个重构信号，0个代码集中度问题。</p>
+            </div>
+
+            <div class="health-cards">
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        
 
         
         <div class="ai-analysis-section">
@@ -65,96 +91,128 @@
             </div>
 
             
-            <script type="text/plain" id="aiAnalysisData">根据提供的 Git 仓库统计数据，我们可以从多个维度进行深入分析，以了解项目的开发模式、团队协作状况、代码质量趋势、生产力情况，并提出改进建议。以下是对该仓库的详细分析：
+            <script type="text/plain" id="aiAnalysisData">根据你提供的 Git 仓库统计数据，我们可以从多个维度对这个项目的开发活动进行分析，并提出一些可行的改进建议。以下是从**开发模式、团队协作、代码质量、生产力趋势**以及**改进建议**五个方面的详细分析。
 
 ---
 
 ## 1. 开发模式分析
 
-- **集中式开发**：该项目仅有一位贡献者（houjiaqi），且提交集中在短短两天内（2025-07-23 至 2025-07-24），说明这是典型的**个人主导型项目**或**原型开发阶段**。
-- **提交时间分布不均**：7 次提交集中在 16:00，其他时间提交较少，表明开发者在一天中主要集中在下午进行集中编码，可能存在**集中开发或冲刺行为**。
-- **开发节奏**：总提交数为 10 次，活跃天数仅为 2 天，平均每天 5 次提交，说明开发者在短时间内进行了密集开发，可能是在构建原型或完成某个功能模块。
+### 提交行为：
+- **总提交数：11 次**
+- **活跃周期：仅 2 天（2025-07-23 至 2025-07-24）**
+- **活跃时间分布：集中在 16:00（7 次提交）**
+
+**分析结论：**
+- 项目开发集中在**短时间内密集提交**，尤其是**16:00 左右**，表明开发人员在这一时间段效率较高或存在集中突击开发行为。
+- 这种模式可能是：
+  - **临时项目或原型开发**
+  - **冲刺阶段的集中开发**
+  - **单人开发的快速迭代**
+
+### 文件修改分布：
+- 修改最多的文件是 `internal/report/web.go`（5 次），其次是 `go.sum` 和多个模块配置文件（如 `go.mod`、`cmd/root.go` 等）。
+- 多个文件被多次修改，说明开发过程中存在**频繁的配置调整与核心逻辑迭代**。
 
 ---
 
 ## 2. 团队协作见解
 
-- **缺乏团队协作**：目前只有一个贡献者，没有多人协作的迹象。这可能意味着：
-  - 项目处于早期阶段；
-  - 或者是个人项目；
-  - 或者团队协作机制尚未建立。
-- **建议引入协作流程**：
-  - 引入 Pull Request（PR）机制；
-  - 使用代码审查（Code Review）提升代码质量；
-  - 制定分支策略（如 Git Flow）来支持多人协作。
+### 贡献者分析：
+- **仅有一名贡献者：houjiaqi**
+- **100% 的提交由该开发者完成**
+
+**分析结论：**
+- 当前项目为**单人开发项目**，没有团队协作迹象。
+- 缺乏多人协作，可能导致：
+  - **知识孤岛**
+  - **缺乏代码评审机制**
+  - **风险集中于单一开发者**
+
+### 建议：
+- 如果项目未来计划扩展为团队协作模式，建议引入：
+  - **Pull Request 流程**
+  - **Code Review 机制**
+  - **分支管理策略（如 Git Flow）**
 
 ---
 
 ## 3. 代码质量观察
 
-- **频繁修改的文件**：
-  - `go.sum` 和 `go.mod` 被多次修改，可能表示依赖频繁变更；
-  - `internal/report/web.go` 和 `internal/ai/ai.go` 也被频繁修改，说明核心逻辑模块在快速迭代；
-  - `README.md` 修改 3 次，可能表示文档在不断完善；
-  - `main.go` 和 `cmd/root.go` 修改次数较多，说明主程序结构可能还在调整。
+### 代码健康等级：
+- **代码健康等级：100 分（健康）**
+- **无技术债务、无重构信号、无集中度问题**
 
-- **潜在问题**：
-  - 频繁修改依赖文件（go.mod/go.sum）可能表示依赖管理不稳定；
-  - 核心模块频繁修改可能意味着架构设计不稳定或需求不明确；
-  - 建议使用单元测试、集成测试来确保重构过程中的稳定性。
+**分析结论：**
+- 尽管提交次数较少，但代码质量良好，结构清晰，维护性强。
+- 可能原因：
+  - 项目处于初期阶段
+  - 开发者有良好的编码习惯
+  - 使用了自动化工具（如 linter、formatter）辅助开发
+
+### 建议：
+- 继续保持高质量编码习惯
+- 引入 CI/CD 自动化测试和静态分析流程，确保长期维护质量
 
 ---
 
 ## 4. 生产力趋势
 
-- **高密度开发**：两天内完成 10 次提交，说明开发者在短时间内有较高的产出；
-- **缺乏持续性**：由于目前仅活跃两天，无法判断长期开发节奏；
-- **可能处于探索阶段**：项目可能处于原型设计或功能探索阶段，尚未进入稳定开发周期；
-- **工具链建议**：
-  - 可引入 CI/CD 工具（如 GitHub Actions、GitLab CI）自动化测试和部署；
-  - 使用代码质量工具（如 golangci-lint）来提升代码可维护性。
+### 提交频率：
+- 仅两天完成 11 次提交，**日均提交 5.5 次**
+- 高频提交集中在**16:00**
+
+**分析结论：**
+- 开发者在短时间内完成大量提交，生产力较高
+- 但缺乏持续的提交节奏，可能为**短期冲刺型开发**
+
+### 文件修改趋势：
+- 多个文件频繁修改，可能表示：
+  - **功能模块尚未稳定**
+  - **设计频繁调整**
+  - **缺乏模块化设计**
 
 ---
 
 ## 5. 改进建议
 
-### 5.1 开发流程优化
+为了提升项目的可维护性、协作效率和可持续性，建议如下：
 
-- **引入分支策略**：使用 feature 分支开发功能，避免直接在主分支上提交；
-- **代码审查机制**：即使当前为单人开发，也可通过 PR 自我审查，提升代码质量；
-- **定期提交规范**：每次提交信息应清晰描述变更内容，便于后期追溯；
-- **版本管理**：开始使用语义化版本（Semantic Versioning），为未来发布做好准备。
+### 1. 引入版本控制最佳实践
+- 使用语义化提交信息（如 `feat: add new feature`, `fix: bug in login flow`）
+- 采用分支管理（如 feature 分支 &#43; main 分支 &#43; release 分支）
 
-### 5.2 项目结构与文档
+### 2. 建立持续集成/交付流程
+- 自动化运行单元测试、集成测试
+- 使用静态代码分析工具（如 golangci-lint）确保代码质量
+- 集成部署流程（如 GitHub Actions、GitLab CI）
 
-- **完善 README**：虽然已修改 3 次，但建议加入项目背景、安装说明、使用示例等；
-- **添加 CONTRIBUTING.md**：为未来团队协作准备开发规范；
-- **文档自动化**：可以使用工具（如 godoc）生成 API 文档，提高可维护性。
+### 3. 加强代码评审机制
+- 即使是单人项目，也可以通过 PR 的方式自我评审，提高代码质量
+- 后续引入其他开发者时，确保代码风格统一、逻辑清晰
 
-### 5.3 技术实践建议
+### 4. 文档与注释规范化
+- `README.md` 被修改 3 次，说明文档在更新，建议建立文档维护机制
+- 在关键代码中加入注释说明，提升可读性
 
-- **增加测试覆盖率**：为频繁修改的文件（如 web.go、ai.go）编写单元测试；
-- **静态代码检查**：配置 golangci-lint 等工具，提升代码质量；
-- **依赖管理优化**：避免频繁修改 go.mod，可通过 `go mod tidy` 清理无用依赖。
-
-### 5.4 未来协作准备
-
-- **代码模块化设计**：将功能模块拆分清晰，便于后续多人协作；
-- **任务拆分与追踪**：使用 issue 跟踪工具（如 GitHub Issues）规划开发任务；
-- **开发日志记录**：通过 CHANGELOG 或开发日志记录项目演进过程。
+### 5. 监控开发节奏与健康度
+- 使用 Git 分析工具定期检查提交频率、代码复杂度、技术债务等指标
+- 如果未来扩展为团队项目，建议使用看板工具（如 Jira、Trello）进行任务管理
 
 ---
 
 ## 总结
 
-该项目目前处于**个人主导、快速迭代的早期阶段**，具有较高的开发密度，但缺乏团队协作和规范流程。未来建议：
+| 分析维度       | 主要观察点                                     | 改进建议                             |
+|----------------|------------------------------------------------|--------------------------------------|
+| 开发模式       | 短期内集中提交，单人开发                       | 引入 Git Flow、语义化提交             |
+| 团队协作       | 仅一人贡献，无协作机制                         | 引入 PR 流程、代码评审                |
+| 代码质量       | 健康度满分，无技术债务                         | 继续保持、引入 CI 检查                |
+| 生产力趋势     | 日均提交量高，但缺乏持续性                     | 建立开发节奏、使用看板管理任务        |
+| 改进建议       | 适合引入 CI/CD、文档维护、分支管理             | 全面提升项目工程化水平                |
 
-- 引入协作机制和代码审查；
-- 完善文档和测试；
-- 规范提交和分支策略；
-- 为项目长期发展打下良好基础。
+---
 
-这些改进措施将有助于项目从“快速原型”阶段顺利过渡到“可维护、可扩展、可协作”的成熟阶段。</script>
+如果你愿意提供更详细的提交历史（如 commit message、具体修改内容），我可以进一步深入分析功能迭代路径和开发决策逻辑。</script>
         </div>
         
 
@@ -166,8 +224,8 @@
                     
                     <div class="author-item">
                         <span class="author-name">houjiaqi</span>
-                        <span class="author-stats">10 次提交 (100.0%)</span>
-                        <span class="author-changes">+6532/-1401</span>
+                        <span class="author-stats">11 次提交 (100.0%)</span>
+                        <span class="author-changes">+8059/-1642</span>
                     </div>
                     
                 </div>
@@ -195,7 +253,7 @@
                 
                 <div class="file-item">
                     <span class="file-name">internal/report/web.go</span>
-                    <span class="file-count">4 次修改</span>
+                    <span class="file-count">5 次修改</span>
                 </div>
                 
                 <div class="file-item">
@@ -204,12 +262,12 @@
                 </div>
                 
                 <div class="file-item">
-                    <span class="file-name">main.go</span>
+                    <span class="file-name">internal/i18n/messages.go</span>
                     <span class="file-count">3 次修改</span>
                 </div>
                 
                 <div class="file-item">
-                    <span class="file-name">cmd/root.go</span>
+                    <span class="file-name">main.go</span>
                     <span class="file-count">3 次修改</span>
                 </div>
                 
@@ -219,42 +277,22 @@
                 </div>
                 
                 <div class="file-item">
-                    <span class="file-name">go.mod</span>
-                    <span class="file-count">3 次修改</span>
-                </div>
-                
-                <div class="file-item">
                     <span class="file-name">internal/ai/ai.go</span>
                     <span class="file-count">3 次修改</span>
                 </div>
                 
                 <div class="file-item">
-                    <span class="file-name">test/test-data.sh</span>
-                    <span class="file-count">2 次修改</span>
+                    <span class="file-name">go.mod</span>
+                    <span class="file-count">3 次修改</span>
                 </div>
                 
                 <div class="file-item">
-                    <span class="file-name">internal/analyzer/analyzer.go</span>
-                    <span class="file-count">2 次修改</span>
-                </div>
-                
-                <div class="file-item">
-                    <span class="file-name">final-analysis.txt</span>
-                    <span class="file-count">2 次修改</span>
-                </div>
-                
-                <div class="file-item">
-                    <span class="file-name">demo.sh</span>
-                    <span class="file-count">2 次修改</span>
+                    <span class="file-name">cmd/root.go</span>
+                    <span class="file-count">3 次修改</span>
                 </div>
                 
                 <div class="file-item">
                     <span class="file-name">test/README.md</span>
-                    <span class="file-count">2 次修改</span>
-                </div>
-                
-                <div class="file-item">
-                    <span class="file-name">test-reports/charts.js</span>
                     <span class="file-count">2 次修改</span>
                 </div>
                 
@@ -264,7 +302,27 @@
                 </div>
                 
                 <div class="file-item">
+                    <span class="file-name">final-analysis.txt</span>
+                    <span class="file-count">2 次修改</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-name">analysis-reports/styles.css</span>
+                    <span class="file-count">2 次修改</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-name">analysis-reports/index.html</span>
+                    <span class="file-count">2 次修改</span>
+                </div>
+                
+                <div class="file-item">
                     <span class="file-name">analysis-report.txt</span>
+                    <span class="file-count">2 次修改</span>
+                </div>
+                
+                <div class="file-item">
+                    <span class="file-name">test-reports/charts.js</span>
                     <span class="file-count">2 次修改</span>
                 </div>
                 
@@ -275,10 +333,10 @@
     <script src="charts.js"></script>
     <script>
         const reportData = {
-            authors: [{"Name":"houjiaqi","CommitCount":10,"Additions":6532,"Deletions":1401,"Percentage":100}],
-            hourly: [{"Hour":9,"Count":1},{"Hour":14,"Count":1},{"Hour":15,"Count":1},{"Hour":16,"Count":7}],
-            daily: [{"Day":"周四","Count":3},{"Day":"周三","Count":7}],
-            timeline: [{"Date":"2025-07-23","Count":7},{"Date":"2025-07-24","Count":3}]
+            authors: [{"Name":"houjiaqi","CommitCount":11,"Additions":8059,"Deletions":1642,"Percentage":100}],
+            hourly: [{"Hour":9,"Count":1},{"Hour":14,"Count":1},{"Hour":15,"Count":1},{"Hour":16,"Count":7},{"Hour":17,"Count":1}],
+            daily: [{"Day":"周四","Count":4},{"Day":"周三","Count":7}],
+            timeline: [{"Date":"2025-07-23","Count":7},{"Date":"2025-07-24","Count":4}]
         };
         console.log('Report data:', reportData);
         initCharts(reportData);

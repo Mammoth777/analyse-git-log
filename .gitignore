@@ -60,3 +60,17 @@ git-log-analyzer
 
 # Local config files
 .git-log-analyzer.yaml
+
+# Test output files
+test/*-test.txt
+test/*-reports/
+test/web-test-reports/
+test/data-test-reports/
+test/comprehensive-test-reports/
+
+# Old test files (cleanup)
+analysis-report.txt
+demo-text-report.txt
+final-analysis.txt
+test-reports/
+demo-reports/

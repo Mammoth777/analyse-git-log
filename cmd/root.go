@@ -21,6 +21,7 @@ var outputFile string
 var generateWeb bool
 var outputDir string
 var openBrowser bool
+var reportLanguage string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -39,7 +40,10 @@ Environment variables for AI analysis:
 - AI_API_KEY: API key (required for AI analysis)
 - AI_MODEL: Model to use (default: gpt-3.5-turbo)
 - AI_MAX_TOKENS: Maximum tokens (default: 2000)
-- AI_TEMPERATURE: Temperature setting (default: 0.7)`,
+- AI_TEMPERATURE: Temperature setting (default: 0.7)
+
+Environment variables for report customization:
+- REPORT_LANGUAGE: Report language (zh/en, default: zh)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := analyzeGitLog(repoPath); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -64,6 +68,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&generateWeb, "web", true, "generate web-based HTML report")
 	rootCmd.PersistentFlags().StringVar(&outputDir, "output-dir", getEnv("REPORT_OUTPUT_DIR", "./analysis-reports"), "output directory for reports")
 	rootCmd.PersistentFlags().BoolVar(&openBrowser, "open", getEnvBool("AUTO_OPEN_BROWSER", false), "automatically open web report in browser")
+	rootCmd.PersistentFlags().StringVarP(&reportLanguage, "lang", "l", getEnv("REPORT_LANGUAGE", "zh"), "report language (zh/en)")
 
 	// Bind flags to viper
 	viper.BindPFlag("repo", rootCmd.PersistentFlags().Lookup("repo"))
@@ -95,6 +100,11 @@ func initConfig() {
 }
 
 func analyzeGitLog(repoPath string) error {
+	// Set language from command line flag
+	if reportLanguage != "" {
+		os.Setenv("REPORT_LANGUAGE", reportLanguage)
+	}
+	
 	fmt.Printf("Analyzing git repository at: %s\n", repoPath)
 	
 	// Verify git installation

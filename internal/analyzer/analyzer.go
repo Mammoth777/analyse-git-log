@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"git-log-analyzer/internal/git"
+	"git-log-analyzer/internal/i18n"
 )
 
 // Statistics contains analysis results
@@ -177,18 +178,19 @@ func getWeekNumber(t time.Time) int {
 
 // GenerateReport generates a text report from statistics
 func (stats *Statistics) GenerateReport() string {
-	report := fmt.Sprintf("=== Git Repository Analysis Report ===\n\n")
+	msg := i18n.T()
+	report := fmt.Sprintf("%s\n\n", msg.ReportTitle)
 	
-	report += fmt.Sprintf("Total Commits: %d\n", stats.TotalCommits)
-	report += fmt.Sprintf("Active Period: %s to %s\n", 
+	report += fmt.Sprintf("%s: %d\n", msg.TotalCommits, stats.TotalCommits)
+	report += fmt.Sprintf("%s: %s to %s\n", msg.ActivePeriod,
 		stats.TimeStats.FirstCommit.Format("2006-01-02"),
 		stats.TimeStats.LastCommit.Format("2006-01-02"))
-	report += fmt.Sprintf("Active Days: %d\n", stats.TimeStats.ActiveDays)
-	report += fmt.Sprintf("Active Weeks: %d\n", stats.TimeStats.ActiveWeeks)
-	report += fmt.Sprintf("Active Months: %d\n\n", stats.TimeStats.ActiveMonths)
+	report += fmt.Sprintf("%s: %d\n", msg.ActiveDays, stats.TimeStats.ActiveDays)
+	report += fmt.Sprintf("%s: %d\n", msg.ActiveWeeks, stats.TimeStats.ActiveWeeks)
+	report += fmt.Sprintf("%s: %d\n\n", msg.ActiveMonths, stats.TimeStats.ActiveMonths)
 
 	// Top authors by commit count
-	report += "=== Top Contributors ===\n"
+	report += msg.TopContributors + "\n"
 	type authorPair struct {
 		key   string
 		stats *AuthorStat
@@ -207,13 +209,13 @@ func (stats *Statistics) GenerateReport() string {
 		if i >= 10 { // Top 10 authors
 			break
 		}
-		report += fmt.Sprintf("%d. %s: %d commits (+%d/-%d lines)\n",
-			i+1, author.stats.Name, author.stats.CommitCount, 
-			author.stats.Additions, author.stats.Deletions)
+		report += fmt.Sprintf("%d. %s: %d %s (+%d/-%d %s)\n",
+			i+1, author.stats.Name, author.stats.CommitCount, msg.Commits,
+			author.stats.Additions, author.stats.Deletions, msg.Lines)
 	}
 
 	// Most active hours
-	report += "\n=== Most Active Hours ===\n"
+	report += "\n" + msg.MostActiveHours + "\n"
 	type hourPair struct {
 		hour  int
 		count int
@@ -232,11 +234,11 @@ func (stats *Statistics) GenerateReport() string {
 		if i >= 5 { // Top 5 hours
 			break
 		}
-		report += fmt.Sprintf("%02d:00 - %d commits\n", h.hour, h.count)
+		report += fmt.Sprintf("%02d:00 - %d %s\n", h.hour, h.count, msg.Commits)
 	}
 
 	// Most modified files
-	report += "\n=== Most Modified Files ===\n"
+	report += "\n" + msg.MostModifiedFiles + "\n"
 	type filePair struct {
 		file  string
 		count int
@@ -255,7 +257,7 @@ func (stats *Statistics) GenerateReport() string {
 		if i >= 10 { // Top 10 files
 			break
 		}
-		report += fmt.Sprintf("%s: %d modifications\n", f.file, f.count)
+		report += fmt.Sprintf("%s: %d %s\n", f.file, f.count, msg.Modifications)
 	}
 
 	return report

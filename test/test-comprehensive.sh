@@ -6,14 +6,27 @@
 echo "=== Git Log Analyzer 综合测试 ==="
 echo ""
 
-# 确保在正确的目录
-cd "$(dirname "$0")"
+# 获取脚本所在目录的绝对路径
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+BINARY_PATH="$PROJECT_DIR/git-log-analyzer"
+
+# 切换到项目根目录
+cd "$PROJECT_DIR"
 
 # 检查是否存在主程序
-if [ ! -f "../git-log-analyzer" ]; then
+if [ ! -f "$BINARY_PATH" ]; then
     echo "构建主程序..."
-    cd .. && go build -o git-log-analyzer && cd test
+    go build -o git-log-analyzer
+    if [ $? -ne 0 ]; then
+        echo "❌ 构建失败"
+        exit 1
+    fi
+    echo "✅ 构建成功"
 fi
+
+# 切换回test目录
+cd "$SCRIPT_DIR"
 
 # 清理之前的测试结果
 echo "清理之前的测试结果..."
@@ -26,7 +39,7 @@ echo "----------------------------------------"
 
 # 测试基础分析
 echo "🔍 测试基础分析..."
-../git-log-analyzer --repo .. --web=false --output comprehensive-test.txt
+"$BINARY_PATH" --repo "$PROJECT_DIR" --web=false --output comprehensive-test.txt
 if [ $? -eq 0 ]; then
     echo "✅ 基础分析成功"
 else
@@ -36,7 +49,7 @@ fi
 
 # 测试网页报告生成
 echo "🔍 测试网页报告生成..."
-../git-log-analyzer --repo .. --output-dir comprehensive-test-reports --web
+"$BINARY_PATH" --repo "$PROJECT_DIR" --output-dir comprehensive-test-reports --web
 if [ $? -eq 0 ]; then
     echo "✅ 网页报告生成成功"
 else

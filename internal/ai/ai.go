@@ -1,15 +1,19 @@
 package ai
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"fmt"
-	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"git-log-analyzer/internal/analyzer"
+	"git-log-analyzer/internal/i18n"
+
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
+	"github.com/openai/openai-go/packages/param"
 )
 
 // AIConfig contains configuration for AI analysis
@@ -17,7 +21,7 @@ type AIConfig struct {
 	APIEndpoint string
 	APIKey      string
 	Model       string
-	MaxTokens   int
+	MaxTokens   int64
 	Temperature float64
 }
 
@@ -37,7 +41,7 @@ type ChatMessage struct {
 type ChatRequest struct {
 	Model       string        `json:"model"`
 	Messages    []ChatMessage `json:"messages"`
-	MaxTokens   int           `json:"max_tokens,omitempty"`
+	MaxTokens   int64         `json:"max_tokens,omitempty"`
 	Temperature float64       `json:"temperature,omitempty"`
 }
 
@@ -58,7 +62,7 @@ func NewAIClient() (*AIClient, error) {
 		APIEndpoint: getEnv("AI_API_ENDPOINT", "https://api.openai.com/v1/chat/completions"),
 		APIKey:      getEnv("AI_API_KEY", ""),
 		Model:       getEnv("AI_MODEL", "gpt-3.5-turbo"),
-		MaxTokens:   getEnvInt("AI_MAX_TOKENS", 2000),
+		MaxTokens:   int64(getEnvInt("AI_MAX_TOKENS", 2000)),
 		Temperature: getEnvFloat("AI_TEMPERATURE", 0.7),
 	}
 
@@ -119,31 +123,15 @@ func ValidateConfig(config AIConfig) error {
 // AnalyzeWithAI performs AI-powered analysis of git statistics
 func (c *AIClient) AnalyzeWithAI(stats *analyzer.Statistics, basicReport string) (string, error) {
 	prompt := c.buildAnalysisPrompt(stats, basicReport)
-	
+	log.Println("AI analysis request with prompt:", prompt)
 	return c.sendChatRequest(prompt)
 }
 
 // buildAnalysisPrompt creates a prompt for AI analysis
 func (c *AIClient) buildAnalysisPrompt(stats *analyzer.Statistics, basicReport string) string {
-	prompt := fmt.Sprintf(`Please analyze the following Git repository statistics and provide insights:
-
-BASIC STATISTICS:
-%s
-
-DETAILED DATA:
-- Total commits: %d
-- Number of contributors: %d
-- Active period: %s to %s
-- Active days: %d
-
-Please provide:
-1. Development pattern analysis
-2. Team collaboration insights
-3. Code quality observations
-4. Productivity trends
-5. Recommendations for improvement
-
-Focus on actionable insights that can help improve the development process.`,
+	msg := i18n.T()
+	
+	prompt := fmt.Sprintf(msg.AIPromptTemplate,
 		basicReport,
 		stats.TotalCommits,
 		len(stats.AuthorStats),
@@ -156,64 +144,29 @@ Focus on actionable insights that can help improve the development process.`,
 
 // sendChatRequest sends a request to the AI chat API
 func (c *AIClient) sendChatRequest(prompt string) (string, error) {
-	request := ChatRequest{
-		Model: c.config.Model,
-		Messages: []ChatMessage{
-			{
-				Role:    "system",
-				Content: "You are an expert software development analyst. Analyze git repository data and provide actionable insights.",
+	msg := i18n.T()
+	
+	client := openai.NewClient(
+		option.WithAPIKey(os.Getenv("AI_API_KEY")),
+		option.WithBaseURL(os.Getenv("AI_API_ENDPOINT")),
+	)
+	chatCompletion, err := client.Chat.Completions.New(
+		context.TODO(), 
+		openai.ChatCompletionNewParams{
+			Messages: []openai.ChatCompletionMessageParamUnion{
+				openai.SystemMessage(msg.AISystemMessage),
+				openai.UserMessage(prompt),
 			},
-			{
-				Role:    "user",
-				Content: prompt,
-			},
+			Model: "qwen-plus",
+			MaxTokens: param.Opt[int64]{Value: c.config.MaxTokens},
+			Temperature: param.Opt[float64]{Value: c.config.Temperature},
 		},
-		MaxTokens:   c.config.MaxTokens,
-		Temperature: c.config.Temperature,
-	}
+	)
 
-	jsonData, err := json.Marshal(request)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal request: %v", err)
+		return "", fmt.Errorf("failed to get AI response: %v", err)
 	}
-
-	req, err := http.NewRequest("POST", c.config.APIEndpoint, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %v", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to send request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read response: %v", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(body))
-	}
-
-	var response ChatResponse
-	if err := json.Unmarshal(body, &response); err != nil {
-		return "", fmt.Errorf("failed to unmarshal response: %v", err)
-	}
-
-	if response.Error.Message != "" {
-		return "", fmt.Errorf("API error: %s", response.Error.Message)
-	}
-
-	if len(response.Choices) == 0 {
-		return "", fmt.Errorf("no response choices returned")
-	}
-
-	return response.Choices[0].Message.Content, nil
+	return chatCompletion.Choices[0].Message.Content, nil
 }
 
 // getEnv gets environment variable with default value

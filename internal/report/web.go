@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"git-log-analyzer/internal/analyzer"
+	"git-log-analyzer/internal/i18n"
 )
 
 // WebReportGenerator generates HTML reports
@@ -35,6 +36,8 @@ type ReportData struct {
 	FileData         []FileData
 	CommitTimeline   []TimelineData
 	AIAnalysis       string
+	Messages         *i18n.Messages
+	Language         i18n.Language
 }
 
 // AuthorData represents author statistics for web display
@@ -100,11 +103,16 @@ func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalys
 
 // prepareReportData prepares data for web report
 func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, projectName string) *ReportData {
+	lang := i18n.GetLanguage()
+	msg := i18n.GetMessages(lang)
+	
 	data := &ReportData{
 		GeneratedAt: time.Now(),
 		ProjectName: projectName,
 		Stats:       stats,
 		AIAnalysis:  aiAnalysis,
+		Messages:    msg,
+		Language:    lang,
 	}
 
 	// Prepare top authors
@@ -148,10 +156,9 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 	})
 
 	// Prepare daily data
-	dayNames := []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 	for day, count := range stats.TimeStats.DailyPattern {
 		data.DailyData = append(data.DailyData, DayData{
-			Day:   dayNames[day],
+			Day:   msg.DayNames[day],
 			Count: count,
 		})
 	}
@@ -220,52 +227,52 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
 	}
 
 	tmpl := `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{if eq .Language "en"}}en{{else}}zh-CN{{end}}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Git Log Analysis Report - {{.ProjectName}}</title>
+    <title>{{.Messages.ReportTitle}} - {{.ProjectName}}</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>Git Log Analysis Report</h1>
+            <h1>{{.Messages.ReportTitle}}</h1>
             <div class="subtitle">
                 <h2>{{.ProjectName}}</h2>
-                <p>Generated on {{.GeneratedAt.Format "2006-01-02 15:04:05"}}</p>
+                <p>{{.Messages.GeneratedOn}} {{.GeneratedAt.Format "2006-01-02 15:04:05"}}</p>
             </div>
         </header>
 
         <div class="summary">
             <div class="stat-card">
-                <h3>Total Commits</h3>
+                <h3>{{.Messages.TotalCommits}}</h3>
                 <div class="stat-number">{{.Stats.TotalCommits}}</div>
             </div>
             <div class="stat-card">
-                <h3>Contributors</h3>
+                <h3>{{.Messages.Contributors}}</h3>
                 <div class="stat-number">{{len .Stats.AuthorStats}}</div>
             </div>
             <div class="stat-card">
-                <h3>Active Days</h3>
+                <h3>{{.Messages.ActiveDays}}</h3>
                 <div class="stat-number">{{.Stats.TimeStats.ActiveDays}}</div>
             </div>
             <div class="stat-card">
-                <h3>Active Period</h3>
+                <h3>{{.Messages.ActivePeriod}}</h3>
                 <div class="stat-text">{{.Stats.TimeStats.FirstCommit.Format "2006-01-02"}} to {{.Stats.TimeStats.LastCommit.Format "2006-01-02"}}</div>
             </div>
         </div>
 
         <div class="charts-grid">
             <div class="chart-container">
-                <h3>Top Contributors</h3>
+                <h3>{{.Messages.TopContributors}}</h3>
                 <canvas id="authorsChart"></canvas>
                 <div class="authors-list">
                     {{range .TopAuthors}}
                     <div class="author-item">
                         <span class="author-name">{{.Name}}</span>
-                        <span class="author-stats">{{.CommitCount}} commits ({{printf "%.1f" .Percentage}}%)</span>
+                        <span class="author-stats">{{.CommitCount}} {{$.Messages.Commits}} ({{printf "%.1f" .Percentage}}%)</span>
                         <span class="author-changes">+{{.Additions}}/-{{.Deletions}}</span>
                     </div>
                     {{end}}
@@ -273,28 +280,28 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
             </div>
 
             <div class="chart-container">
-                <h3>Commit Timeline</h3>
+                <h3>{{.Messages.CommitTimeline}}</h3>
                 <canvas id="timelineChart"></canvas>
             </div>
 
             <div class="chart-container">
-                <h3>Hourly Activity</h3>
+                <h3>{{.Messages.HourlyActivity}}</h3>
                 <canvas id="hourlyChart"></canvas>
             </div>
 
             <div class="chart-container">
-                <h3>Daily Activity</h3>
+                <h3>{{.Messages.DailyActivity}}</h3>
                 <canvas id="dailyChart"></canvas>
             </div>
         </div>
 
         <div class="files-section">
-            <h3>Most Modified Files</h3>
+            <h3>{{.Messages.MostModifiedFiles}}</h3>
             <div class="files-grid">
                 {{range .FileData}}
                 <div class="file-item">
                     <span class="file-name">{{.Name}}</span>
-                    <span class="file-count">{{.Count}} modifications</span>
+                    <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
                 </div>
                 {{end}}
             </div>
@@ -302,7 +309,7 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
 
         {{if .AIAnalysis}}
         <div class="ai-analysis">
-            <h3>🤖 AI Analysis</h3>
+            <h3>🤖 {{.Messages.AIAnalysisTitle}}</h3>
             <div class="ai-content">
                 <pre>{{.AIAnalysis}}</pre>
             </div>

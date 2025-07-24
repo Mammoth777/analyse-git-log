@@ -6,6 +6,7 @@
     <title>{{.Messages.ReportTitle}} - {{.ProjectName}}</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -37,14 +38,34 @@
         </div>
 
         {{if .AIAnalysis}}
-        <div class="ai-analysis-highlight">
+        <div class="ai-analysis-section">
             <div class="ai-header">
                 <h2>🤖 {{.Messages.AIAnalysisTitle}}</h2>
-                <p class="ai-subtitle">{{.Messages.AIAnalysisSubtitle}}</p>
             </div>
-            <div class="ai-content">
-                {{.AIAnalysisHTML}}
+            
+            <!-- 关键发现 -->
+            <div class="ai-key-insights">
+                <div class="insights-grid" id="keyInsights">
+                    <!-- 将通过JavaScript动态填充 -->
+                </div>
             </div>
+
+            <!-- 统一的AI分析折叠卡片 -->
+            <div class="ai-analysis-cards">
+                <div class="analysis-card">
+                    <div class="card-header" onclick="toggleAIAnalysis()">
+                        <span class="card-icon">🤖</span>
+                        <span class="card-title">详细AI分析</span>
+                        <span class="toggle-icon" id="aiAnalysis-icon">▼</span>
+                    </div>
+                    <div class="card-content" id="aiAnalysis-content">
+                        <div class="content-loading">点击展开查看完整AI分析...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 隐藏的原始数据，供JavaScript解析使用 -->
+            <script type="text/plain" id="aiAnalysisData">{{.AIAnalysis}}</script>
         </div>
         {{end}}
 

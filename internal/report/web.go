@@ -12,8 +12,6 @@ import (
 
 	"git-log-analyzer/internal/analyzer"
 	"git-log-analyzer/internal/i18n"
-
-	"github.com/russross/blackfriday/v2"
 )
 
 //go:embed templates/report.html
@@ -48,7 +46,6 @@ type ReportData struct {
 	FileData         []FileData
 	CommitTimeline   []TimelineData
 	AIAnalysis       string
-	AIAnalysisHTML   template.HTML
 	Messages         *i18n.Messages
 	Language         i18n.Language
 }
@@ -84,22 +81,6 @@ type FileData struct {
 type TimelineData struct {
 	Date  string
 	Count int
-}
-
-// markdownToHTML converts markdown to HTML using blackfriday
-func markdownToHTML(markdown string) template.HTML {
-	// Configure blackfriday with desired extensions
-	extensions := blackfriday.CommonExtensions | blackfriday.AutoHeadingIDs
-	
-	// Create renderer with HTML flags
-	renderer := blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
-		Flags: blackfriday.CommonHTMLFlags | blackfriday.HrefTargetBlank,
-	})
-	
-	// Convert markdown to HTML
-	htmlBytes := blackfriday.Run([]byte(markdown), blackfriday.WithRenderer(renderer), blackfriday.WithExtensions(extensions))
-	
-	return template.HTML(htmlBytes)
 }
 
 // GenerateReport generates a complete HTML report
@@ -140,7 +121,6 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 		ProjectName:    projectName,
 		Stats:          stats,
 		AIAnalysis:     aiAnalysis,
-		AIAnalysisHTML: markdownToHTML(aiAnalysis),
 		Messages:       msg,
 		Language:       lang,
 	}

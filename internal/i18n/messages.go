@@ -45,7 +45,6 @@ type Messages struct {
 	AIPromptTemplate        string
 	AISystemMessage         string
 	AIAnalysisTitle         string
-	AIAnalysisSubtitle      string
 }
 
 // translations contains all language translations
@@ -94,8 +93,7 @@ var translations = map[Language]*Messages{
 重点关注可以帮助改进开发流程的可行见解。`,
 
 		AISystemMessage: "你是一位专业的软件开发分析师。请分析Git仓库数据并提供可行的见解。请用中文回答。",
-		AIAnalysisTitle: "AI 分析结果",
-		AIAnalysisSubtitle: "基于Git数据的智能分析",
+		AIAnalysisTitle: "智能分析",
 	},
 	
 	LangEN: {
@@ -142,8 +140,7 @@ Please provide:
 Focus on actionable insights that can help improve the development process.`,
 
 		AISystemMessage: "You are an expert software development analyst. Analyze git repository data and provide actionable insights.",
-		AIAnalysisTitle: "AI Analysis Results",
-		AIAnalysisSubtitle: "Intelligent Analysis Based on Git Data",
+		AIAnalysisTitle: "Intelligent Analysis",
 	},
 }
 

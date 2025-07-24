@@ -1,0 +1,28 @@
+Git 仓库分析报告
+
+总提交数: 10
+活跃周期: 2025-07-23 to 2025-07-24
+活跃天数: 2
+活跃周数: 1
+活跃月数: 1
+
+主要贡献者
+1. houjiaqi: 10 次提交 (+6532/-1401 行)
+
+最活跃时间
+16:00 - 7 次提交
+09:00 - 1 次提交
+15:00 - 1 次提交
+14:00 - 1 次提交
+
+修改最多的文件
+go.sum: 4 次修改
+internal/report/web.go: 4 次修改
+README.md: 3 次修改
+internal/ai/ai.go: 3 次修改
+cmd/root.go: 3 次修改
+go.mod: 3 次修改
+main.go: 3 次修改
+final-analysis.txt: 2 次修改
+demo.sh: 2 次修改
+analysis-report.txt: 2 次修改

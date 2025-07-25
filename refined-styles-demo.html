@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精致样式演示 - Git分析器主体优化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.02) 0%, 
+                rgba(168, 85, 247, 0.02) 50%, 
+                rgba(59, 130, 246, 0.02) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* 精致的页面头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.95) 0%, 
+                rgba(168, 85, 247, 0.95) 50%, 
+                rgba(59, 130, 246, 0.95) 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 60px rgba(99, 102, 241, 0.25),
+                0 8px 30px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='3'/%3E%3Ccircle cx='53' cy='53' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 3.2em;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 
+                0 2px 10px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(255, 255, 255, 0.1);
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px 32px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                0 1px 4px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                #3b82f6 0%, 
+                #8b5cf6 50%, 
+                #06b6d4 100%);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.15),
+                0 8px 30px rgba(59, 130, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-card h3 {
+            color: #1f2937;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            opacity: 0.7;
+        }
+
+        .stat-card .stat-number {
+            font-size: 3.2em;
+            font-weight: 800;
+            color: #3b82f6;
+            margin-bottom: 8px;
+            line-height: 1;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            margin-bottom: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.06),
+                0 1px 4px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .content-section:hover {
+            border-color: rgba(59, 130, 246, 0.2);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.1),
+                0 4px 20px rgba(59, 130, 246, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, 
+                rgba(59, 130, 246, 0.05) 0%, 
+                rgba(99, 102, 241, 0.05) 100%);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 32px 40px;
+            position: relative;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                #3b82f6 0%, 
+                #8b5cf6 50%, 
+                #06b6d4 100%);
+        }
+
+        .section-header h2 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        .section-header p {
+            font-size: 1.05em;
+            color: #6b7280;
+            margin: 0;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .section-content {
+            padding: 40px;
+        }
+
+        /* AI洞察卡片 */
+        .ai-insight {
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.9) 0%, 
+                rgba(168, 85, 247, 0.9) 50%, 
+                rgba(59, 130, 246, 0.9) 100%);
+            color: white;
+            padding: 32px;
+            border-radius: 20px;
+            margin: 24px 0;
+            box-shadow: 
+                0 12px 40px rgba(99, 102, 241, 0.3),
+                0 4px 20px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-insight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .ai-insight h4 {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3em;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ai-insight p {
+            position: relative;
+            z-index: 1;
+            line-height: 1.6;
+            font-size: 1.05em;
+        }
+
+        /* 贡献者卡片 */
+        .contributor-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .contributor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                #3b82f6 0%, 
+                #8b5cf6 50%, 
+                #06b6d4 100%);
+        }
+
+        .contributor-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 2px 12px rgba(59, 130, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .contributor-card h4 {
+            color: #1f2937;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+        }
+
+        .contributor-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(59, 130, 246, 0.08);
+            color: #3b82f6;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            backdrop-filter: blur(8px);
+        }
+
+        .feature-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- 精致的页面头部 -->
+        <div class="header">
+            <h1>🎨 精致样式设计</h1>
+            <p>Git分析器主体样式全面优化完成</p>
+        </div>
+
+        <!-- 统计卡片展示 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>总提交数</h3>
+                <div class="stat-number">1,247</div>
+            </div>
+            <div class="stat-card">
+                <h3>贡献者</h3>
+                <div class="stat-number">12</div>
+            </div>
+            <div class="stat-card">
+                <h3>活跃天数</h3>
+                <div class="stat-number">89</div>
+            </div>
+            <div class="stat-card">
+                <h3>代码健康度</h3>
+                <div class="stat-number">95%</div>
+            </div>
+        </div>
+
+        <!-- 内容区域展示 -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>📊 贡献者分析</h2>
+                <p>团队成员的贡献情况和活跃度分析</p>
+            </div>
+            <div class="section-content">
+                <div class="contributor-card">
+                    <h4>👨‍💻 张三 (zhang.san@company.com)</h4>
+                    <div class="contributor-stats">
+                        <span class="stat-item">提交: 145</span>
+                        <span class="stat-item">添加: 2,341行</span>
+                        <span class="stat-item">删除: 892行</span>
+                        <span class="stat-item">文件: 67</span>
+                    </div>
+                </div>
+
+                <div class="contributor-card">
+                    <h4>👩‍💻 李四 (li.si@company.com)</h4>
+                    <div class="contributor-stats">
+                        <span class="stat-item">提交: 98</span>
+                        <span class="stat-item">添加: 1,876行</span>
+                        <span class="stat-item">删除: 534行</span>
+                        <span class="stat-item">文件: 43</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI洞察展示 -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>🤖 AI洞察</h2>
+                <p>智能分析结果和深度洞察</p>
+            </div>
+            <div class="section-content">
+                <div class="ai-insight">
+                    <h4>🎯 开发模式分析</h4>
+                    <p>团队采用敏捷开发模式，提交频率稳定，代码质量持续改善。建议增加代码审查流程以进一步提升质量。</p>
+                </div>
+
+                <div class="ai-insight">
+                    <h4>📈 生产力趋势</h4>
+                    <p>最近30天生产力提升15%，主要体现在bug修复效率和新功能开发速度上。团队协作效率良好。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能特色展示 -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>✨ 样式优化特色</h2>
+                <p>全面提升的视觉设计和用户体验</p>
+            </div>
+            <div class="section-content">
+                <div class="feature-showcase">
+                    <div class="contributor-card">
+                        <h4>🎨 视觉设计</h4>
+                        <div class="contributor-stats">
+                            <span class="stat-item">毛玻璃效果</span>
+                            <span class="stat-item">渐变色彩</span>
+                            <span class="stat-item">微妙阴影</span>
+                            <span class="stat-item">圆角设计</span>
+                        </div>
+                    </div>
+
+                    <div class="contributor-card">
+                        <h4>🔄 交互动画</h4>
+                        <div class="contributor-stats">
+                            <span class="stat-item">悬浮效果</span>
+                            <span class="stat-item">平滑过渡</span>
+                            <span class="stat-item">弹性动画</span>
+                            <span class="stat-item">状态反馈</span>
+                        </div>
+                    </div>
+
+                    <div class="contributor-card">
+                        <h4>📱 响应式设计</h4>
+                        <div class="contributor-stats">
+                            <span class="stat-item">移动端适配</span>
+                            <span class="stat-item">弹性布局</span>
+                            <span class="stat-item">触控优化</span>
+                            <span class="stat-item">多屏适配</span>
+                        </div>
+                    </div>
+
+                    <div class="contributor-card">
+                        <h4>🎯 用户体验</h4>
+                        <div class="contributor-stats">
+                            <span class="stat-item">清晰层次</span>
+                            <span class="stat-item">易读性强</span>
+                            <span class="stat-item">操作流畅</span>
+                            <span class="stat-item">信息密度优化</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -17,57 +17,121 @@
         <span></span>
     </button>
 
-    <!-- 固定悬浮的左侧菜单 -->
+    <!-- 极简悬浮左侧菜单 -->
     <nav class="sidebar-floating">
         <div class="sidebar-header">
-            <h3>📊 分析维度</h3>
+            <div class="logo">📊</div>
+            <h3>Git 分析</h3>
         </div>
-        <ul class="sidebar-menu">
-            <li class="menu-item active" data-section="overview">
-                <i class="icon">📈</i>
-                <span>项目概览</span>
-            </li>
-            <li class="menu-item" data-section="contributors">
-                <i class="icon">👥</i>
-                <span>贡献者分析</span>
-            </li>
-            <li class="menu-item" data-section="activity">
-                <i class="icon">⏰</i>
-                <span>活动时间分析</span>
-            </li>
-            <li class="menu-item" data-section="branch">
-                <i class="icon">🌲</i>
-                <span>分支结构</span>
-            </li>
-            <li class="menu-item" data-section="health">
-                <i class="icon">🏥</i>
-                <span>代码健康</span>
-            </li>
-            <li class="menu-item" data-section="ai">
-                <i class="icon">🤖</i>
-                <span>AI 分析</span>
-            </li>
-            <li class="menu-item disabled" data-section="security">
-                <i class="icon">🔒</i>
-                <span>安全分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="performance">
-                <i class="icon">⚡</i>
-                <span>性能分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="dependencies">
-                <i class="icon">📦</i>
-                <span>依赖分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="quality">
-                <i class="icon">⭐</i>
-                <span>代码质量</span>
-                <small>即将上线</small>
-            </li>
-        </ul>
+        
+        <!-- 基础分析 -->
+        <div class="menu-group">
+            <div class="group-label">基础分析</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="overview">
+                    <i class="icon">📈</i>
+                    <span>项目概览</span>
+                </li>
+                <li class="menu-item" data-section="contributors">
+                    <i class="icon">👥</i>
+                    <span>贡献者分析</span>
+                </li>
+                <li class="menu-item" data-section="activity">
+                    <i class="icon">⏰</i>
+                    <span>活动分析</span>
+                </li>
+                <li class="menu-item" data-section="branch">
+                    <i class="icon">🌲</i>
+                    <span>分支结构</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 代码质量 -->
+        <div class="menu-group">
+            <div class="group-label">代码质量</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" data-section="health">
+                    <i class="icon">🏥</i>
+                    <span>代码健康</span>
+                </li>
+                <li class="menu-item disabled" data-section="quality">
+                    <i class="icon">✨</i>
+                    <span>质量评估</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+                <li class="menu-item disabled" data-section="debt">
+                    <i class="icon">🔧</i>
+                    <span>技术债务</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 智能分析 -->
+        <div class="menu-group">
+            <div class="group-label">智能分析</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" data-section="ai">
+                    <i class="icon">🤖</i>
+                    <span>AI 洞察</span>
+                </li>
+                <li class="menu-item disabled" data-section="patterns">
+                    <i class="icon">🔍</i>
+                    <span>开发模式</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+                <li class="menu-item disabled" data-section="collaboration">
+                    <i class="icon">🤝</i>
+                    <span>协作分析</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 安全与性能 -->
+        <div class="menu-group">
+            <div class="group-label">安全与性能</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item disabled" data-section="security">
+                    <i class="icon">🔒</i>
+                    <span>安全分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="performance">
+                    <i class="icon">⚡</i>
+                    <span>性能分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="dependencies">
+                    <i class="icon">📦</i>
+                    <span>依赖分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 高级功能 -->
+        <div class="menu-group">
+            <div class="group-label">高级功能</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item disabled" data-section="productivity">
+                    <i class="icon">📊</i>
+                    <span>生产力分析</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="learning">
+                    <i class="icon">📚</i>
+                    <span>学习曲线</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="timeline">
+                    <i class="icon">📅</i>
+                    <span>时间轴热力图</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+            </ul>
+        </div>
     </nav>
 
     <!-- 主内容区域 -->
@@ -366,16 +430,102 @@
             </section>
 
             <!-- 空白的未来功能区域 -->
-            <section id="security-section" class="content-section">
+            
+            <!-- 质量评估 -->
+            <section id="quality-section" class="content-section">
                 <div class="section-header">
-                    <h2>🔒 安全分析</h2>
-                    <p>代码安全漏洞检测和风险评估</p>
+                    <h2>✨ 质量评估</h2>
+                    <p>全面的代码质量分析和评分系统</p>
                 </div>
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
                         <h3>功能开发中</h3>
-                        <p>安全分析功能正在开发中，敬请期待！</p>
+                        <p>质量评估功能正在开发中，将提供更全面的代码质量分析。</p>
+                        <ul class="feature-list">
+                            <li>• 代码风格一致性检查</li>
+                            <li>• 循环复杂度分析</li>
+                            <li>• 可读性评分</li>
+                            <li>• 注释覆盖率统计</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 技术债务 -->
+            <section id="debt-section" class="content-section">
+                <div class="section-header">
+                    <h2>🔧 技术债务</h2>
+                    <p>技术债务识别、量化和偿还建议</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能开发中</h3>
+                        <p>技术债务分析功能正在开发中，帮助团队管理和偿还技术债务。</p>
+                        <ul class="feature-list">
+                            <li>• 债务热点地图</li>
+                            <li>• 债务累积趋势</li>
+                            <li>• 偿还优先级建议</li>
+                            <li>• ROI 计算器</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 开发模式 -->
+            <section id="patterns-section" class="content-section">
+                <div class="section-header">
+                    <h2>� 开发模式</h2>
+                    <p>智能识别团队开发模式和最佳实践</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能开发中</h3>
+                        <p>开发模式分析功能基于AI算法，识别团队的工作模式。</p>
+                        <ul class="feature-list">
+                            <li>• 提交模式识别</li>
+                            <li>• 开发节奏分析</li>
+                            <li>• 工作时间偏好</li>
+                            <li>• 个人风格画像</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 协作分析 -->
+            <section id="collaboration-section" class="content-section">
+                <div class="section-header">
+                    <h2>🤝 协作分析</h2>
+                    <p>团队协作效率和知识流动分析</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能开发中</h3>
+                        <p>协作分析功能将深入分析团队协作模式和效率。</p>
+                        <ul class="feature-list">
+                            <li>• 协作网络图</li>
+                            <li>• 知识传播路径</li>
+                            <li>• 代码评审效率</li>
+                            <li>• 跨团队协作分析</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 安全分析 -->
+            <section id="security-section" class="content-section">
+                <div class="section-header">
+                    <h2>�🔒 安全分析</h2>
+                    <p>代码安全漏洞检测和风险评估</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能计划中</h3>
+                        <p>安全分析功能正在规划中，将为您的代码提供全面的安全保障。</p>
                         <ul class="feature-list">
                             <li>• 安全漏洞扫描</li>
                             <li>• 敏感信息检测</li>
@@ -386,6 +536,7 @@
                 </div>
             </section>
 
+            <!-- 性能分析 -->
             <section id="performance-section" class="content-section">
                 <div class="section-header">
                     <h2>⚡ 性能分析</h2>
@@ -394,8 +545,8 @@
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>性能分析功能正在开发中，敬请期待！</p>
+                        <h3>功能计划中</h3>
+                        <p>性能分析功能正在规划中，帮助您识别和优化性能瓶颈。</p>
                         <ul class="feature-list">
                             <li>• 性能热点识别</li>
                             <li>• 算法复杂度分析</li>
@@ -406,6 +557,7 @@
                 </div>
             </section>
 
+            <!-- 依赖分析 -->
             <section id="dependencies-section" class="content-section">
                 <div class="section-header">
                     <h2>📦 依赖分析</h2>
@@ -414,8 +566,8 @@
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>依赖分析功能正在开发中，敬请期待！</p>
+                        <h3>功能计划中</h3>
+                        <p>依赖分析功能正在规划中，提供全方位的依赖管理洞察。</p>
                         <ul class="feature-list">
                             <li>• 依赖树可视化</li>
                             <li>• 版本兼容性检查</li>
@@ -426,21 +578,64 @@
                 </div>
             </section>
 
-            <section id="quality-section" class="content-section">
+            <!-- 生产力分析 -->
+            <section id="productivity-section" class="content-section">
                 <div class="section-header">
-                    <h2>⭐ 代码质量</h2>
-                    <p>代码风格、复杂度和可维护性评估</p>
+                    <h2>📊 生产力分析</h2>
+                    <p>团队和个人生产力深度分析</p>
                 </div>
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>代码质量分析功能正在开发中，敬请期待！</p>
+                        <h3>功能规划中</h3>
+                        <p>生产力分析功能正在规划中，基于多维度数据提供生产力洞察。</p>
                         <ul class="feature-list">
-                            <li>• 代码风格检查</li>
-                            <li>• 复杂度分析</li>
-                            <li>• 重复代码检测</li>
-                            <li>• 可维护性评分</li>
+                            <li>• 效率波动分析</li>
+                            <li>• 生产力趋势预测</li>
+                            <li>• 工作负载平衡分析</li>
+                            <li>• 瓶颈识别与建议</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 学习曲线 -->
+            <section id="learning-section" class="content-section">
+                <div class="section-header">
+                    <h2>📚 学习曲线</h2>
+                    <p>开发者成长轨迹和技能发展分析</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能规划中</h3>
+                        <p>学习曲线分析功能正在规划中，追踪开发者的成长历程。</p>
+                        <ul class="feature-list">
+                            <li>• 技能成长轨迹</li>
+                            <li>• 学习效率评估</li>
+                            <li>• 知识领域扩展分析</li>
+                            <li>• 导师关系识别</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 时间轴热力图 -->
+            <section id="timeline-section" class="content-section">
+                <div class="section-header">
+                    <h2>📅 时间轴热力图</h2>
+                    <p>项目活动的时空分布可视化</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能规划中</h3>
+                        <p>时间轴热力图功能正在规划中，提供直观的活动分布视图。</p>
+                        <ul class="feature-list">
+                            <li>• 交互式时间轴</li>
+                            <li>• 多维度热力图</li>
+                            <li>• 活动密度分析</li>
+                            <li>• 趋势模式识别</li>
                         </ul>
                     </div>
                 </div>
@@ -472,6 +667,23 @@
         function toggleMobileMenu() {
             const sidebar = document.querySelector('.sidebar-floating');
             sidebar.classList.toggle('mobile-open');
+            
+            // 添加点击外部关闭菜单功能
+            if (sidebar.classList.contains('mobile-open')) {
+                document.addEventListener('click', closeMobileMenuOnOutsideClick);
+            } else {
+                document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+            }
+        }
+
+        function closeMobileMenuOnOutsideClick(event) {
+            const sidebar = document.querySelector('.sidebar-floating');
+            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                sidebar.classList.remove('mobile-open');
+                document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+            }
         }
 
         // 侧边栏菜单功能

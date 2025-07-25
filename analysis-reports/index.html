@@ -20,54 +20,118 @@
     
     <nav class="sidebar-floating">
         <div class="sidebar-header">
-            <h3>📊 分析维度</h3>
+            <div class="logo">📊</div>
+            <h3>Git 分析</h3>
         </div>
-        <ul class="sidebar-menu">
-            <li class="menu-item active" data-section="overview">
-                <i class="icon">📈</i>
-                <span>项目概览</span>
-            </li>
-            <li class="menu-item" data-section="contributors">
-                <i class="icon">👥</i>
-                <span>贡献者分析</span>
-            </li>
-            <li class="menu-item" data-section="activity">
-                <i class="icon">⏰</i>
-                <span>活动时间分析</span>
-            </li>
-            <li class="menu-item" data-section="branch">
-                <i class="icon">🌲</i>
-                <span>分支结构</span>
-            </li>
-            <li class="menu-item" data-section="health">
-                <i class="icon">🏥</i>
-                <span>代码健康</span>
-            </li>
-            <li class="menu-item" data-section="ai">
-                <i class="icon">🤖</i>
-                <span>AI 分析</span>
-            </li>
-            <li class="menu-item disabled" data-section="security">
-                <i class="icon">🔒</i>
-                <span>安全分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="performance">
-                <i class="icon">⚡</i>
-                <span>性能分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="dependencies">
-                <i class="icon">📦</i>
-                <span>依赖分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="quality">
-                <i class="icon">⭐</i>
-                <span>代码质量</span>
-                <small>即将上线</small>
-            </li>
-        </ul>
+        
+        
+        <div class="menu-group">
+            <div class="group-label">基础分析</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="overview">
+                    <i class="icon">📈</i>
+                    <span>项目概览</span>
+                </li>
+                <li class="menu-item" data-section="contributors">
+                    <i class="icon">👥</i>
+                    <span>贡献者分析</span>
+                </li>
+                <li class="menu-item" data-section="activity">
+                    <i class="icon">⏰</i>
+                    <span>活动分析</span>
+                </li>
+                <li class="menu-item" data-section="branch">
+                    <i class="icon">🌲</i>
+                    <span>分支结构</span>
+                </li>
+            </ul>
+        </div>
+
+        
+        <div class="menu-group">
+            <div class="group-label">代码质量</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" data-section="health">
+                    <i class="icon">🏥</i>
+                    <span>代码健康</span>
+                </li>
+                <li class="menu-item disabled" data-section="quality">
+                    <i class="icon">✨</i>
+                    <span>质量评估</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+                <li class="menu-item disabled" data-section="debt">
+                    <i class="icon">🔧</i>
+                    <span>技术债务</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+            </ul>
+        </div>
+
+        
+        <div class="menu-group">
+            <div class="group-label">智能分析</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" data-section="ai">
+                    <i class="icon">🤖</i>
+                    <span>AI 洞察</span>
+                </li>
+                <li class="menu-item disabled" data-section="patterns">
+                    <i class="icon">🔍</i>
+                    <span>开发模式</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+                <li class="menu-item disabled" data-section="collaboration">
+                    <i class="icon">🤝</i>
+                    <span>协作分析</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+            </ul>
+        </div>
+
+        
+        <div class="menu-group">
+            <div class="group-label">安全与性能</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item disabled" data-section="security">
+                    <i class="icon">🔒</i>
+                    <span>安全分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="performance">
+                    <i class="icon">⚡</i>
+                    <span>性能分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="dependencies">
+                    <i class="icon">📦</i>
+                    <span>依赖分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+            </ul>
+        </div>
+
+        
+        <div class="menu-group">
+            <div class="group-label">高级功能</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item disabled" data-section="productivity">
+                    <i class="icon">📊</i>
+                    <span>生产力分析</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="learning">
+                    <i class="icon">📚</i>
+                    <span>学习曲线</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+                <li class="menu-item disabled" data-section="timeline">
+                    <i class="icon">📅</i>
+                    <span>时间轴热力图</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+            </ul>
+        </div>
     </nav>
 
     
@@ -76,7 +140,7 @@
                 <h1>Git 仓库分析报告</h1>
                 <div class="subtitle">
                     <h2>Current Repository</h2>
-                    <p>生成时间 2025-07-25 14:01:51</p>
+                    <p>生成时间 2025-07-25 16:02:18</p>
                 </div>
             </header>
 
@@ -90,7 +154,7 @@
                 <div class="summary">
                     <div class="stat-card">
                         <h3>总提交数</h3>
-                        <div class="stat-number">17</div>
+                        <div class="stat-number">18</div>
                     </div>
                     <div class="stat-card">
                         <h3>贡献者</h3>
@@ -116,8 +180,18 @@
                         </div>
                         
                         <div class="file-item">
+                            <span class="file-name">internal/report/templates/styles.css</span>
+                            <span class="file-count">6 次修改</span>
+                        </div>
+                        
+                        <div class="file-item">
+                            <span class="file-name">internal/report/templates/report.html</span>
+                            <span class="file-count">6 次修改</span>
+                        </div>
+                        
+                        <div class="file-item">
                             <span class="file-name">analysis-reports/index.html</span>
-                            <span class="file-count">5 次修改</span>
+                            <span class="file-count">6 次修改</span>
                         </div>
                         
                         <div class="file-item">
@@ -126,12 +200,7 @@
                         </div>
                         
                         <div class="file-item">
-                            <span class="file-name">internal/report/templates/styles.css</span>
-                            <span class="file-count">5 次修改</span>
-                        </div>
-                        
-                        <div class="file-item">
-                            <span class="file-name">internal/report/templates/report.html</span>
+                            <span class="file-name">analysis-reports/styles.css</span>
                             <span class="file-count">5 次修改</span>
                         </div>
                         
@@ -141,17 +210,12 @@
                         </div>
                         
                         <div class="file-item">
+                            <span class="file-name">internal/i18n/messages.go</span>
+                            <span class="file-count">4 次修改</span>
+                        </div>
+                        
+                        <div class="file-item">
                             <span class="file-name">internal/ai/ai.go</span>
-                            <span class="file-count">4 次修改</span>
-                        </div>
-                        
-                        <div class="file-item">
-                            <span class="file-name">go.mod</span>
-                            <span class="file-count">4 次修改</span>
-                        </div>
-                        
-                        <div class="file-item">
-                            <span class="file-name">analysis-reports/styles.css</span>
                             <span class="file-count">4 次修改</span>
                         </div>
                         
@@ -161,18 +225,8 @@
                         </div>
                         
                         <div class="file-item">
-                            <span class="file-name">internal/i18n/messages.go</span>
+                            <span class="file-name">go.mod</span>
                             <span class="file-count">4 次修改</span>
-                        </div>
-                        
-                        <div class="file-item">
-                            <span class="file-name">README.md</span>
-                            <span class="file-count">3 次修改</span>
-                        </div>
-                        
-                        <div class="file-item">
-                            <span class="file-name">main.go</span>
-                            <span class="file-count">3 次修改</span>
                         </div>
                         
                         <div class="file-item">
@@ -181,7 +235,17 @@
                         </div>
                         
                         <div class="file-item">
+                            <span class="file-name">README.md</span>
+                            <span class="file-count">3 次修改</span>
+                        </div>
+                        
+                        <div class="file-item">
                             <span class="file-name">internal/report/templates/charts.js</span>
+                            <span class="file-count">3 次修改</span>
+                        </div>
+                        
+                        <div class="file-item">
+                            <span class="file-name">Roadmap.md</span>
                             <span class="file-count">3 次修改</span>
                         </div>
                         
@@ -206,8 +270,8 @@
                                 <span class="author-name">houjiaqi</span>
                             </a>
                             
-                            <span class="author-stats">16 次提交 (94.1%)</span>
-                            <span class="author-changes">+16572/-2061</span>
+                            <span class="author-stats">17 次提交 (94.4%)</span>
+                            <span class="author-changes">+18596/-2468</span>
                         </div>
                         
                         <div class="author-item">
@@ -216,7 +280,7 @@
                                 <span class="author-name">Jachy</span>
                             </a>
                             
-                            <span class="author-stats">1 次提交 (5.9%)</span>
+                            <span class="author-stats">1 次提交 (5.6%)</span>
                             <span class="author-changes">+1/-1</span>
                         </div>
                         
@@ -262,7 +326,7 @@
                         <select id="branchFilter" class="forest-select">
                             <option value="all">所有分支</option>
                             
-                            <option value="main">main (17)</option>
+                            <option value="main">main (18)</option>
                             
                         </select>
                     </div>
@@ -338,16 +402,102 @@
             </section>
 
             
-            <section id="security-section" class="content-section">
+            
+            
+            <section id="quality-section" class="content-section">
                 <div class="section-header">
-                    <h2>🔒 安全分析</h2>
-                    <p>代码安全漏洞检测和风险评估</p>
+                    <h2>✨ 质量评估</h2>
+                    <p>全面的代码质量分析和评分系统</p>
                 </div>
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
                         <h3>功能开发中</h3>
-                        <p>安全分析功能正在开发中，敬请期待！</p>
+                        <p>质量评估功能正在开发中，将提供更全面的代码质量分析。</p>
+                        <ul class="feature-list">
+                            <li>• 代码风格一致性检查</li>
+                            <li>• 循环复杂度分析</li>
+                            <li>• 可读性评分</li>
+                            <li>• 注释覆盖率统计</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            
+            <section id="debt-section" class="content-section">
+                <div class="section-header">
+                    <h2>🔧 技术债务</h2>
+                    <p>技术债务识别、量化和偿还建议</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能开发中</h3>
+                        <p>技术债务分析功能正在开发中，帮助团队管理和偿还技术债务。</p>
+                        <ul class="feature-list">
+                            <li>• 债务热点地图</li>
+                            <li>• 债务累积趋势</li>
+                            <li>• 偿还优先级建议</li>
+                            <li>• ROI 计算器</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            
+            <section id="patterns-section" class="content-section">
+                <div class="section-header">
+                    <h2>� 开发模式</h2>
+                    <p>智能识别团队开发模式和最佳实践</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能开发中</h3>
+                        <p>开发模式分析功能基于AI算法，识别团队的工作模式。</p>
+                        <ul class="feature-list">
+                            <li>• 提交模式识别</li>
+                            <li>• 开发节奏分析</li>
+                            <li>• 工作时间偏好</li>
+                            <li>• 个人风格画像</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            
+            <section id="collaboration-section" class="content-section">
+                <div class="section-header">
+                    <h2>🤝 协作分析</h2>
+                    <p>团队协作效率和知识流动分析</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能开发中</h3>
+                        <p>协作分析功能将深入分析团队协作模式和效率。</p>
+                        <ul class="feature-list">
+                            <li>• 协作网络图</li>
+                            <li>• 知识传播路径</li>
+                            <li>• 代码评审效率</li>
+                            <li>• 跨团队协作分析</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            
+            <section id="security-section" class="content-section">
+                <div class="section-header">
+                    <h2>�🔒 安全分析</h2>
+                    <p>代码安全漏洞检测和风险评估</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能计划中</h3>
+                        <p>安全分析功能正在规划中，将为您的代码提供全面的安全保障。</p>
                         <ul class="feature-list">
                             <li>• 安全漏洞扫描</li>
                             <li>• 敏感信息检测</li>
@@ -358,6 +508,7 @@
                 </div>
             </section>
 
+            
             <section id="performance-section" class="content-section">
                 <div class="section-header">
                     <h2>⚡ 性能分析</h2>
@@ -366,8 +517,8 @@
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>性能分析功能正在开发中，敬请期待！</p>
+                        <h3>功能计划中</h3>
+                        <p>性能分析功能正在规划中，帮助您识别和优化性能瓶颈。</p>
                         <ul class="feature-list">
                             <li>• 性能热点识别</li>
                             <li>• 算法复杂度分析</li>
@@ -378,6 +529,7 @@
                 </div>
             </section>
 
+            
             <section id="dependencies-section" class="content-section">
                 <div class="section-header">
                     <h2>📦 依赖分析</h2>
@@ -386,8 +538,8 @@
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>依赖分析功能正在开发中，敬请期待！</p>
+                        <h3>功能计划中</h3>
+                        <p>依赖分析功能正在规划中，提供全方位的依赖管理洞察。</p>
                         <ul class="feature-list">
                             <li>• 依赖树可视化</li>
                             <li>• 版本兼容性检查</li>
@@ -398,21 +550,64 @@
                 </div>
             </section>
 
-            <section id="quality-section" class="content-section">
+            
+            <section id="productivity-section" class="content-section">
                 <div class="section-header">
-                    <h2>⭐ 代码质量</h2>
-                    <p>代码风格、复杂度和可维护性评估</p>
+                    <h2>📊 生产力分析</h2>
+                    <p>团队和个人生产力深度分析</p>
                 </div>
                 <div class="empty-section">
                     <div class="coming-soon">
                         <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>代码质量分析功能正在开发中，敬请期待！</p>
+                        <h3>功能规划中</h3>
+                        <p>生产力分析功能正在规划中，基于多维度数据提供生产力洞察。</p>
                         <ul class="feature-list">
-                            <li>• 代码风格检查</li>
-                            <li>• 复杂度分析</li>
-                            <li>• 重复代码检测</li>
-                            <li>• 可维护性评分</li>
+                            <li>• 效率波动分析</li>
+                            <li>• 生产力趋势预测</li>
+                            <li>• 工作负载平衡分析</li>
+                            <li>• 瓶颈识别与建议</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            
+            <section id="learning-section" class="content-section">
+                <div class="section-header">
+                    <h2>📚 学习曲线</h2>
+                    <p>开发者成长轨迹和技能发展分析</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能规划中</h3>
+                        <p>学习曲线分析功能正在规划中，追踪开发者的成长历程。</p>
+                        <ul class="feature-list">
+                            <li>• 技能成长轨迹</li>
+                            <li>• 学习效率评估</li>
+                            <li>• 知识领域扩展分析</li>
+                            <li>• 导师关系识别</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            
+            <section id="timeline-section" class="content-section">
+                <div class="section-header">
+                    <h2>📅 时间轴热力图</h2>
+                    <p>项目活动的时空分布可视化</p>
+                </div>
+                <div class="empty-section">
+                    <div class="coming-soon">
+                        <div class="icon">🚧</div>
+                        <h3>功能规划中</h3>
+                        <p>时间轴热力图功能正在规划中，提供直观的活动分布视图。</p>
+                        <ul class="feature-list">
+                            <li>• 交互式时间轴</li>
+                            <li>• 多维度热力图</li>
+                            <li>• 活动密度分析</li>
+                            <li>• 趋势模式识别</li>
                         </ul>
                     </div>
                 </div>
@@ -422,12 +617,12 @@
     <script src="charts.js"></script>
     <script>
         const reportData = {
-            authors: [{"Name":"houjiaqi","CommitCount":16,"Additions":16572,"Deletions":2061,"Percentage":94.11764705882352},{"Name":"Jachy","CommitCount":1,"Additions":1,"Deletions":1,"Percentage":5.88235294117647}],
-            hourly: [{"Hour":9,"Count":2},{"Hour":10,"Count":1},{"Hour":11,"Count":1},{"Hour":14,"Count":1},{"Hour":15,"Count":1},{"Hour":16,"Count":7},{"Hour":17,"Count":4}],
-            daily: [{"Day":"周五","Count":3},{"Day":"周四","Count":7},{"Day":"周三","Count":7}],
-            timeline: [{"Date":"2025-07-23","Count":7},{"Date":"2025-07-24","Count":7},{"Date":"2025-07-25","Count":3}]
+            authors: [{"Name":"houjiaqi","CommitCount":17,"Additions":18596,"Deletions":2468,"Percentage":94.44444444444444},{"Name":"Jachy","CommitCount":1,"Additions":1,"Deletions":1,"Percentage":5.555555555555555}],
+            hourly: [{"Hour":9,"Count":2},{"Hour":10,"Count":1},{"Hour":11,"Count":1},{"Hour":14,"Count":2},{"Hour":15,"Count":1},{"Hour":16,"Count":7},{"Hour":17,"Count":4}],
+            daily: [{"Day":"周三","Count":7},{"Day":"周五","Count":4},{"Day":"周四","Count":7}],
+            timeline: [{"Date":"2025-07-23","Count":7},{"Date":"2025-07-24","Count":7},{"Date":"2025-07-25","Count":4}]
             ,
-            branchData: {"branches":[{"name":"main","commit_count":17,"first_commit":"2025-07-23T16:07:35+08:00","last_commit":"2025-07-25T11:11:07+08:00","is_active":true,"main_authors":["houjiaqi \u003choujq@engipower.com\u003e","Jachy \u003c154654738@qq.com\u003e"]}],"commit_graph":[{"hash":"3ee3bcc9a049a817c9bb854912f5cd862c2be068","short_hash":"3ee3bcc9","message":"Initial commit: Git log analyzer tool with AI analysis support","author":"houjiaqi","date":"2025-07-23T16:07:35+08:00","branch":"main","parents":null,"children":["347a59af727e3731f70f6fd327642c7820ab71e9"],"x":0,"y":0,"is_merge":false},{"hash":"347a59af727e3731f70f6fd327642c7820ab71e9","short_hash":"347a59af","message":"Add comprehensive unit tests for git and analyzer packages","author":"houjiaqi","date":"2025-07-23T16:08:41+08:00","branch":"main","parents":["3ee3bcc9a049a817c9bb854912f5cd862c2be068"],"children":["458fcfe68ae50e4581d2c0bba9b88409df49adf0"],"x":0,"y":1,"is_merge":false},{"hash":"458fcfe68ae50e4581d2c0bba9b88409df49adf0","short_hash":"458fcfe6","message":"Update documentation with usage examples","author":"houjiaqi","date":"2025-07-23T16:08:50+08:00","branch":"main","parents":["347a59af727e3731f70f6fd327642c7820ab71e9"],"children":["119bfd25647443ce34690da7e42825eafd829b94"],"x":0,"y":2,"is_merge":false},{"hash":"119bfd25647443ce34690da7e42825eafd829b94","short_hash":"119bfd25","message":"Optimize build process with size reduction flags","author":"houjiaqi","date":"2025-07-23T16:08:57+08:00","branch":"main","parents":["458fcfe68ae50e4581d2c0bba9b88409df49adf0"],"children":["7a1e6b43f9926e1be7b6bfdc6b96bc21d9ab4392"],"x":0,"y":3,"is_merge":false},{"hash":"7a1e6b43f9926e1be7b6bfdc6b96bc21d9ab4392","short_hash":"7a1e6b43","message":"Add demonstration script showcasing all tool features","author":"houjiaqi","date":"2025-07-23T16:09:55+08:00","branch":"main","parents":["119bfd25647443ce34690da7e42825eafd829b94"],"children":["7132ce16cbcc18acbe13faece1ad3a920b48834a"],"x":0,"y":4,"is_merge":false},{"hash":"7132ce16cbcc18acbe13faece1ad3a920b48834a","short_hash":"7132ce16","message":"Add comprehensive project summary and completion documentation","author":"houjiaqi","date":"2025-07-23T16:10:42+08:00","branch":"main","parents":["7a1e6b43f9926e1be7b6bfdc6b96bc21d9ab4392"],"children":[],"x":0,"y":5,"is_merge":false},{"hash":"4a100f38b9387c3ebc75f368a4535f7f0fbdc70a","short_hash":"4a100f38","message":"Major enhancement: Add web report generation, env configuration, and improved AI settings\n\n- Add env.sample for environment configuration guide","author":"houjiaqi","date":"2025-07-23T16:31:15+08:00","branch":"main","parents":null,"children":[],"x":0,"y":6,"is_merge":false},{"hash":"5374d5b5b539085acef6f91577d86d95722058e7","short_hash":"5374d5b5","message":"Fix web report data display issues and organize test suite\n\n🔧 Fixed Issues:","author":"houjiaqi","date":"2025-07-24T09:45:43+08:00","branch":"main","parents":null,"children":["c4b58164412c73a2d8f40def75d2dfe955beeb9f"],"x":0,"y":7,"is_merge":false},{"hash":"c4b58164412c73a2d8f40def75d2dfe955beeb9f","short_hash":"c4b58164","message":"feat: 实现基本功能","author":"houjiaqi","date":"2025-07-24T14:16:15+08:00","branch":"main","parents":["5374d5b5b539085acef6f91577d86d95722058e7"],"children":[],"x":0,"y":8,"is_merge":false},{"hash":"41ec9c1acd531f4dfae7940ec54710cc83a5c959","short_hash":"41ec9c1a","message":"feat: Add comprehensive Git repository analysis report with AI insights\n\n- Created index.html for the analysis report with sections for summary, AI analysis, charts, and most modified files.","author":"houjiaqi","date":"2025-07-24T15:30:18+08:00","branch":"main","parents":null,"children":["f64e447e019ea02e48835a27cb0ce0776975c87b"],"x":0,"y":9,"is_merge":false},{"hash":"f64e447e019ea02e48835a27cb0ce0776975c87b","short_hash":"f64e447e","message":"Add Git repository analysis report with statistics on commits, contributors, and file modifications","author":"houjiaqi","date":"2025-07-24T17:01:42+08:00","branch":"main","parents":["41ec9c1acd531f4dfae7940ec54710cc83a5c959"],"children":[],"x":0,"y":10,"is_merge":false},{"hash":"260ed716ea051d2549cbdf9d55650d75a7ce4277","short_hash":"260ed716","message":"feat: Implement comprehensive code health analysis\n\n- Added a new module for code health analysis in `internal/health`, including metrics for technical debt hotspots, stability indicators, refactoring signals, and code concentration issues.","author":"houjiaqi","date":"2025-07-24T17:30:35+08:00","branch":"main","parents":null,"children":["51f4fe8f8941f147bea9f155236a4584dfd911bc"],"x":0,"y":11,"is_merge":false},{"hash":"51f4fe8f8941f147bea9f155236a4584dfd911bc","short_hash":"51f4fe8f","message":"update","author":"Jachy","date":"2025-07-24T17:36:32+08:00","branch":"main","parents":["260ed716ea051d2549cbdf9d55650d75a7ce4277"],"children":["4135e5b3beca6b9f8117fe215f810882faad6c24"],"x":0,"y":12,"is_merge":false},{"hash":"4135e5b3beca6b9f8117fe215f810882faad6c24","short_hash":"4135e5b3","message":"feat: 优化项目目录结构，集中管理技术说明文档","author":"houjiaqi","date":"2025-07-24T17:38:19+08:00","branch":"main","parents":["51f4fe8f8941f147bea9f155236a4584dfd911bc"],"children":[],"x":0,"y":13,"is_merge":false},{"hash":"e64cd741c5ee767d4ff25e3611f3a860f9571c99","short_hash":"e64cd741","message":"feat: Enhance git log analysis with progress tracking and AI integration\n\n- Implemented a progress tracker for the git log analysis process, providing real-time feedback on each step.","author":"houjiaqi","date":"2025-07-25T09:28:18+08:00","branch":"main","parents":null,"children":[],"x":0,"y":14,"is_merge":false},{"hash":"78e60a4ea15c06fc0cbc9f5a3157d5daa4ccc00a","short_hash":"78e60a4e","message":"feat: Implement developer profile analysis and web navigation features\n\n- Added developer style profile analysis based on Git commit history, including work style, coding patterns, collaboration style, technical features, and personality traits.","author":"houjiaqi","date":"2025-07-25T10:19:43+08:00","branch":"main","parents":null,"children":[],"x":0,"y":15,"is_merge":false},{"hash":"6c203b176381eca9a23df6fb0f5080e06bc0124b","short_hash":"6c203b17","message":"feat: Add commit forest visualization and developer style reports\n\n- Integrated D3.js for commit forest visualization in report.html.","author":"houjiaqi","date":"2025-07-25T11:11:07+08:00","branch":"main","parents":null,"children":[],"x":0,"y":16,"is_merge":false}],"merge_patterns":[]}
+            branchData: {"branches":[{"name":"main","commit_count":18,"first_commit":"2025-07-23T16:07:35+08:00","last_commit":"2025-07-25T14:03:11+08:00","is_active":true,"main_authors":["houjiaqi \u003choujq@engipower.com\u003e","Jachy \u003c154654738@qq.com\u003e"]}],"commit_graph":[{"hash":"3ee3bcc9a049a817c9bb854912f5cd862c2be068","short_hash":"3ee3bcc9","message":"Initial commit: Git log analyzer tool with AI analysis support","author":"houjiaqi","date":"2025-07-23T16:07:35+08:00","branch":"main","parents":null,"children":["347a59af727e3731f70f6fd327642c7820ab71e9"],"x":0,"y":0,"is_merge":false},{"hash":"347a59af727e3731f70f6fd327642c7820ab71e9","short_hash":"347a59af","message":"Add comprehensive unit tests for git and analyzer packages","author":"houjiaqi","date":"2025-07-23T16:08:41+08:00","branch":"main","parents":["3ee3bcc9a049a817c9bb854912f5cd862c2be068"],"children":["458fcfe68ae50e4581d2c0bba9b88409df49adf0"],"x":0,"y":1,"is_merge":false},{"hash":"458fcfe68ae50e4581d2c0bba9b88409df49adf0","short_hash":"458fcfe6","message":"Update documentation with usage examples","author":"houjiaqi","date":"2025-07-23T16:08:50+08:00","branch":"main","parents":["347a59af727e3731f70f6fd327642c7820ab71e9"],"children":["119bfd25647443ce34690da7e42825eafd829b94"],"x":0,"y":2,"is_merge":false},{"hash":"119bfd25647443ce34690da7e42825eafd829b94","short_hash":"119bfd25","message":"Optimize build process with size reduction flags","author":"houjiaqi","date":"2025-07-23T16:08:57+08:00","branch":"main","parents":["458fcfe68ae50e4581d2c0bba9b88409df49adf0"],"children":["7a1e6b43f9926e1be7b6bfdc6b96bc21d9ab4392"],"x":0,"y":3,"is_merge":false},{"hash":"7a1e6b43f9926e1be7b6bfdc6b96bc21d9ab4392","short_hash":"7a1e6b43","message":"Add demonstration script showcasing all tool features","author":"houjiaqi","date":"2025-07-23T16:09:55+08:00","branch":"main","parents":["119bfd25647443ce34690da7e42825eafd829b94"],"children":["7132ce16cbcc18acbe13faece1ad3a920b48834a"],"x":0,"y":4,"is_merge":false},{"hash":"7132ce16cbcc18acbe13faece1ad3a920b48834a","short_hash":"7132ce16","message":"Add comprehensive project summary and completion documentation","author":"houjiaqi","date":"2025-07-23T16:10:42+08:00","branch":"main","parents":["7a1e6b43f9926e1be7b6bfdc6b96bc21d9ab4392"],"children":[],"x":0,"y":5,"is_merge":false},{"hash":"4a100f38b9387c3ebc75f368a4535f7f0fbdc70a","short_hash":"4a100f38","message":"Major enhancement: Add web report generation, env configuration, and improved AI settings\n\n- Add env.sample for environment configuration guide","author":"houjiaqi","date":"2025-07-23T16:31:15+08:00","branch":"main","parents":null,"children":[],"x":0,"y":6,"is_merge":false},{"hash":"5374d5b5b539085acef6f91577d86d95722058e7","short_hash":"5374d5b5","message":"Fix web report data display issues and organize test suite\n\n🔧 Fixed Issues:","author":"houjiaqi","date":"2025-07-24T09:45:43+08:00","branch":"main","parents":null,"children":["c4b58164412c73a2d8f40def75d2dfe955beeb9f"],"x":0,"y":7,"is_merge":false},{"hash":"c4b58164412c73a2d8f40def75d2dfe955beeb9f","short_hash":"c4b58164","message":"feat: 实现基本功能","author":"houjiaqi","date":"2025-07-24T14:16:15+08:00","branch":"main","parents":["5374d5b5b539085acef6f91577d86d95722058e7"],"children":[],"x":0,"y":8,"is_merge":false},{"hash":"41ec9c1acd531f4dfae7940ec54710cc83a5c959","short_hash":"41ec9c1a","message":"feat: Add comprehensive Git repository analysis report with AI insights\n\n- Created index.html for the analysis report with sections for summary, AI analysis, charts, and most modified files.","author":"houjiaqi","date":"2025-07-24T15:30:18+08:00","branch":"main","parents":null,"children":["f64e447e019ea02e48835a27cb0ce0776975c87b"],"x":0,"y":9,"is_merge":false},{"hash":"f64e447e019ea02e48835a27cb0ce0776975c87b","short_hash":"f64e447e","message":"Add Git repository analysis report with statistics on commits, contributors, and file modifications","author":"houjiaqi","date":"2025-07-24T17:01:42+08:00","branch":"main","parents":["41ec9c1acd531f4dfae7940ec54710cc83a5c959"],"children":[],"x":0,"y":10,"is_merge":false},{"hash":"260ed716ea051d2549cbdf9d55650d75a7ce4277","short_hash":"260ed716","message":"feat: Implement comprehensive code health analysis\n\n- Added a new module for code health analysis in `internal/health`, including metrics for technical debt hotspots, stability indicators, refactoring signals, and code concentration issues.","author":"houjiaqi","date":"2025-07-24T17:30:35+08:00","branch":"main","parents":null,"children":["51f4fe8f8941f147bea9f155236a4584dfd911bc"],"x":0,"y":11,"is_merge":false},{"hash":"51f4fe8f8941f147bea9f155236a4584dfd911bc","short_hash":"51f4fe8f","message":"update","author":"Jachy","date":"2025-07-24T17:36:32+08:00","branch":"main","parents":["260ed716ea051d2549cbdf9d55650d75a7ce4277"],"children":["4135e5b3beca6b9f8117fe215f810882faad6c24"],"x":0,"y":12,"is_merge":false},{"hash":"4135e5b3beca6b9f8117fe215f810882faad6c24","short_hash":"4135e5b3","message":"feat: 优化项目目录结构，集中管理技术说明文档","author":"houjiaqi","date":"2025-07-24T17:38:19+08:00","branch":"main","parents":["51f4fe8f8941f147bea9f155236a4584dfd911bc"],"children":[],"x":0,"y":13,"is_merge":false},{"hash":"e64cd741c5ee767d4ff25e3611f3a860f9571c99","short_hash":"e64cd741","message":"feat: Enhance git log analysis with progress tracking and AI integration\n\n- Implemented a progress tracker for the git log analysis process, providing real-time feedback on each step.","author":"houjiaqi","date":"2025-07-25T09:28:18+08:00","branch":"main","parents":null,"children":[],"x":0,"y":14,"is_merge":false},{"hash":"78e60a4ea15c06fc0cbc9f5a3157d5daa4ccc00a","short_hash":"78e60a4e","message":"feat: Implement developer profile analysis and web navigation features\n\n- Added developer style profile analysis based on Git commit history, including work style, coding patterns, collaboration style, technical features, and personality traits.","author":"houjiaqi","date":"2025-07-25T10:19:43+08:00","branch":"main","parents":null,"children":[],"x":0,"y":15,"is_merge":false},{"hash":"6c203b176381eca9a23df6fb0f5080e06bc0124b","short_hash":"6c203b17","message":"feat: Add commit forest visualization and developer style reports\n\n- Integrated D3.js for commit forest visualization in report.html.","author":"houjiaqi","date":"2025-07-25T11:11:07+08:00","branch":"main","parents":null,"children":[],"x":0,"y":16,"is_merge":false},{"hash":"99663829710989859a981b40fec99923be79ea64","short_hash":"99663829","message":"Add responsive sidebar and mobile menu toggle to report template\n\n- Introduced a mobile menu toggle button for better accessibility on smaller screens.","author":"houjiaqi","date":"2025-07-25T14:03:11+08:00","branch":"main","parents":null,"children":[],"x":0,"y":17,"is_merge":false}],"merge_patterns":[]}
             
         };
         console.log('Report data:', reportData);
@@ -444,6 +639,23 @@
         function toggleMobileMenu() {
             const sidebar = document.querySelector('.sidebar-floating');
             sidebar.classList.toggle('mobile-open');
+            
+            
+            if (sidebar.classList.contains('mobile-open')) {
+                document.addEventListener('click', closeMobileMenuOnOutsideClick);
+            } else {
+                document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+            }
+        }
+
+        function closeMobileMenuOnOutsideClick(event) {
+            const sidebar = document.querySelector('.sidebar-floating');
+            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            
+            if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                sidebar.classList.remove('mobile-open');
+                document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+            }
         }
 
         

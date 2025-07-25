@@ -70,7 +70,7 @@ func loadEnvFile() {
 		// Only set if not already set in environment
 		if os.Getenv(key) == "" {
 			os.Setenv(key, value)
-			fmt.Println("Loaded env:", key, "=", value)
+			// fmt.Println("Loaded env:", key, "=", value)
 		}
 	}
 }

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简悬浮菜单演示 - Git分析器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #1f2937;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li::before {
+            content: "✨";
+            margin-right: 12px;
+            font-size: 1.2em;
+        }
+
+        /* 包含模板的菜单样式 */
+        .sidebar-floating {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(24px);
+            position: fixed;
+            top: 5%;
+            left: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-floating:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header .logo {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .sidebar-header h3 {
+            font-size: 18px;
+            margin: 0;
+            font-weight: 700;
+            color: #1f2937;
+            letter-spacing: -0.025em;
+        }
+
+        .menu-group {
+            margin: 0;
+        }
+
+        .group-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 20px 20px 8px;
+            margin: 0;
+        }
+
+        .menu-group:first-of-type .group-label {
+            padding-top: 16px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 1px 8px;
+            border-radius: 12px;
+            min-height: 40px;
+        }
+
+        .menu-item:hover:not(.disabled) {
+            background: rgba(59, 130, 246, 0.06);
+            color: #3b82f6;
+            transform: translateX(2px);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.08) 100%);
+            color: #3b82f6;
+            font-weight: 600;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item .icon {
+            font-size: 16px;
+            margin-right: 12px;
+            opacity: 0.7;
+            min-width: 20px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover:not(.disabled) .icon,
+        .menu-item.active .icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .menu-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            color: #9ca3af;
+        }
+
+        .menu-item.disabled:hover {
+            background: transparent;
+            color: #9ca3af;
+            transform: none;
+        }
+
+        .coming-soon-tag {
+            font-size: 10px;
+            color: #6b7280;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
+            font-weight: 500;
+        }
+
+        .sidebar-floating::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar-floating::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-floating::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 2px;
+        }
+
+        .sidebar-floating::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.16);
+        }
+
+        .main-content {
+            margin-left: 340px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-floating {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 极简悬浮左侧菜单 -->
+    <nav class="sidebar-floating">
+        <div class="sidebar-header">
+            <div class="logo">📊</div>
+            <h3>Git 分析</h3>
+        </div>
+        
+        <!-- 基础分析 -->
+        <div class="menu-group">
+            <div class="group-label">基础分析</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <i class="icon">📈</i>
+                    <span>项目概览</span>
+                </li>
+                <li class="menu-item">
+                    <i class="icon">👥</i>
+                    <span>贡献者分析</span>
+                </li>
+                <li class="menu-item">
+                    <i class="icon">⏰</i>
+                    <span>活动分析</span>
+                </li>
+                <li class="menu-item">
+                    <i class="icon">🌲</i>
+                    <span>分支结构</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 代码质量 -->
+        <div class="menu-group">
+            <div class="group-label">代码质量</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <i class="icon">🏥</i>
+                    <span>代码健康</span>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">✨</i>
+                    <span>质量评估</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">🔧</i>
+                    <span>技术债务</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 智能分析 -->
+        <div class="menu-group">
+            <div class="group-label">智能分析</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <i class="icon">🤖</i>
+                    <span>AI 洞察</span>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">🔍</i>
+                    <span>开发模式</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">🤝</i>
+                    <span>协作分析</span>
+                    <small class="coming-soon-tag">开发中</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 安全与性能 -->
+        <div class="menu-group">
+            <div class="group-label">安全与性能</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item disabled">
+                    <i class="icon">🔒</i>
+                    <span>安全分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">⚡</i>
+                    <span>性能分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">📦</i>
+                    <span>依赖分析</span>
+                    <small class="coming-soon-tag">计划中</small>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 高级功能 -->
+        <div class="menu-group">
+            <div class="group-label">高级功能</div>
+            <ul class="sidebar-menu">
+                <li class="menu-item disabled">
+                    <i class="icon">📊</i>
+                    <span>生产力分析</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">📚</i>
+                    <span>学习曲线</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+                <li class="menu-item disabled">
+                    <i class="icon">📅</i>
+                    <span>时间轴热力图</span>
+                    <small class="coming-soon-tag">规划中</small>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="demo-container">
+            <h1>🎉 极简悬浮菜单设计完成！</h1>
+            
+            <div class="feature-highlight">
+                <h2>✨ 新菜单特性</h2>
+                <ul class="feature-list">
+                    <li>极简风格设计，采用毛玻璃背景和圆角边框</li>
+                    <li>内容按功能分组，层次清晰易导航</li>
+                    <li>支持空菜单项，展示未来功能规划</li>
+                    <li>响应式设计，移动端友好</li>
+                    <li>平滑悬浮效果和微妙的交互动画</li>
+                    <li>基于Roadmap的功能状态标识</li>
+                </ul>
+            </div>
+
+            <div class="feature-highlight">
+                <h2>🗂️ 菜单分组结构</h2>
+                <ul class="feature-list">
+                    <li><strong>基础分析</strong> - 项目概览、贡献者、活动、分支结构</li>
+                    <li><strong>代码质量</strong> - 代码健康、质量评估、技术债务</li>
+                    <li><strong>智能分析</strong> - AI洞察、开发模式、协作分析</li>
+                    <li><strong>安全与性能</strong> - 安全、性能、依赖分析</li>
+                    <li><strong>高级功能</strong> - 生产力、学习曲线、时间轴热力图</li>
+                </ul>
+            </div>
+
+            <div class="feature-highlight">
+                <h2>🎯 实现效果</h2>
+                <ul class="feature-list">
+                    <li>左侧悬浮菜单采用极简设计风格</li>
+                    <li>内容已按不同维度进行逻辑分组</li>
+                    <li>包含多个空菜单项展示未来功能</li>
+                    <li>基于项目Roadmap的功能规划</li>
+                    <li>保持了良好的用户体验和视觉效果</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简单的菜单交互
+        document.querySelectorAll('.menu-item:not(.disabled)').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

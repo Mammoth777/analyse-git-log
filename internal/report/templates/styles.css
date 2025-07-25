@@ -470,6 +470,24 @@ body {
     margin-top: 32px;
 }
 
+.files-section h3 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid;
+    border-image: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.files-section h3::before {
+    content: '📁';
+    font-size: 1.2em;
+}
+
 .files-list {
     margin-top: 20px;
 }
@@ -478,8 +496,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 16px 0;
     border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    background: rgba(59, 130, 246, 0.02);
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+    border-radius: 8px;
 }
 
 .file-item:last-child {
@@ -491,35 +519,61 @@ body {
     color: #374151;
     flex: 1;
     margin-right: 16px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
     font-size: 0.9em;
+    background: rgba(99, 102, 241, 0.05);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border-left: 3px solid #6366f1;
 }
 
 .file-bar {
     position: relative;
     flex: 2;
-    height: 24px;
-    background: rgba(59, 130, 246, 0.1);
-    border-radius: 12px;
+    height: 28px;
+    background: rgba(59, 130, 246, 0.08);
+    border-radius: 14px;
     overflow: hidden;
     display: flex;
     align-items: center;
+    border: 1px solid rgba(59, 130, 246, 0.15);
 }
 
 .file-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
-    border-radius: 12px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+    border-radius: 14px;
     transition: width 0.8s ease;
+    position: relative;
+}
+
+.file-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .file-count {
     position: absolute;
-    right: 8px;
+    right: 12px;
     font-size: 0.8em;
-    font-weight: 600;
+    font-weight: 700;
     color: #1f2937;
     z-index: 1;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 /* 贡献者分析布局 */

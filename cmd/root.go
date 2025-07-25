@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"git-log-analyzer/internal/ai"
 	"git-log-analyzer/internal/analyzer"
-	"git-log-analyzer/internal/git"
+	"git-log-analyzer/internal/progress"
 	"git-log-analyzer/internal/report"
 )
 
@@ -105,69 +107,111 @@ func analyzeGitLog(repoPath string) error {
 		os.Setenv("REPORT_LANGUAGE", reportLanguage)
 	}
 	
-	fmt.Printf("Analyzing git repository at: %s\n", repoPath)
-	
-	// Verify git installation
-	if !git.IsGitInstalled() {
-		return fmt.Errorf("git is not installed or not available in PATH")
+	// Initialize progress tracker (using custom implementation)
+	totalSteps := 3 // Git分析、报告生成、输出
+	if useAI {
+		totalSteps = 4 // 增加AI分析步骤
 	}
 	
-	// Create analyzer
-	a := analyzer.NewAnalyzer(repoPath)
+	tracker := progress.NewProgressTracker(totalSteps, true)
 	
-	// Perform analysis
-	fmt.Println("Performing git log analysis...")
+	fmt.Printf("\n🔍 开始分析Git仓库: %s\n", repoPath)
+	
+	// 添加一些延迟让动态进度条效果更明显
+	time.Sleep(500 * time.Millisecond)
+	
+	// Step 1: Environment validation and initialization
+	tracker.StartStep("环境验证与初始化")
+	
+	// Validate git environment
+	time.Sleep(300 * time.Millisecond) // 模拟耗时操作
+	tracker.UpdateStepProgress("Git环境验证通过")
+	
+	// Create analyzer
+	time.Sleep(400 * time.Millisecond) // 模拟耗时操作
+	tracker.UpdateStepProgress("创建分析器实例")
+	
+	a := analyzer.NewAnalyzer(repoPath)
+	tracker.CompleteStep("环境初始化完成")
+	
+	time.Sleep(300 * time.Millisecond) // 让用户看到完成状态
+	
+	// Step 2: Git Log Analysis
+	tracker.StartStep("Git日志分析")
+	tracker.UpdateStepProgress("获取提交历史...")
+	
 	stats, err := a.Analyze()
 	if err != nil {
+		tracker.FailStep(fmt.Sprintf("分析失败: %v", err))
 		return fmt.Errorf("failed to analyze repository: %v", err)
 	}
 	
-	// Generate basic report
+	tracker.UpdateStepProgress(fmt.Sprintf("已分析 %d 个提交", stats.TotalCommits))
+	if stats.CodeHealthMetrics != nil {
+		tracker.UpdateStepProgress(fmt.Sprintf("代码健康评分: %.0f/100", stats.CodeHealthMetrics.HealthScore*100))
+	}
+	
 	basicReport := stats.GenerateReport()
+	tracker.CompleteStep("Git日志分析完成")
 	
 	var finalReport string
 	var aiAnalysis string
 	
-	// AI analysis if enabled
+	// Step 3: AI Analysis (if enabled)
 	if useAI {
-		fmt.Println("Performing AI-powered analysis...")
+		tracker.StartStep("AI智能分析")
+		tracker.UpdateStepProgress("初始化AI客户端...")
+		
 		aiClient, err := ai.NewAIClient()
 		if err != nil {
-			fmt.Printf("Warning: AI analysis failed: %v\n", err)
-			fmt.Println("Continuing with basic analysis only...")
+			tracker.CompleteStepWithWarning("AI分析跳过", fmt.Sprintf("AI客户端初始化失败: %v", err))
 			finalReport = basicReport
 		} else {
+			tracker.UpdateStepProgress("发送分析请求到AI服务...")
 			aiResult, err := aiClient.AnalyzeWithAI(stats, basicReport)
 			if err != nil {
-				fmt.Printf("Warning: AI analysis failed: %v\n", err)
-				fmt.Println("Continuing with basic analysis only...")
+				tracker.CompleteStepWithWarning("AI分析跳过", fmt.Sprintf("AI分析失败: %v", err))
 				finalReport = basicReport
 			} else {
+				tracker.UpdateStepProgress("AI分析响应处理完成")
 				aiAnalysis = aiResult
 				finalReport = basicReport + "\n\n=== AI-Powered Analysis ===\n" + aiAnalysis
+				tracker.CompleteStep("AI智能分析完成")
 			}
 		}
 	} else {
 		finalReport = basicReport
 	}
 	
+	// Step 4: Report Generation
+	tracker.StartStep("报告生成与输出")
+	
+	reportGenerated := false
+	
 	// Generate web report
 	if generateWeb {
-		fmt.Println("Generating web report...")
+		tracker.UpdateStepProgress("生成Web报告...")
 		webGen := report.NewWebReportGenerator(outputDir)
 		projectName := filepath.Base(repoPath)
 		if projectName == "." || projectName == "" {
 			projectName = "Current Repository"
 		}
 		
+		subTracker := tracker.CreateSubTracker("Web报告生成", 3)
+		subTracker.UpdateSub("准备报告数据")
+		subTracker.UpdateSub("渲染HTML模板")
+		
 		err := webGen.GenerateReport(stats, aiAnalysis, projectName)
 		if err != nil {
-			fmt.Printf("Warning: Failed to generate web report: %v\n", err)
+			tracker.UpdateStepProgress(fmt.Sprintf("Web报告生成失败: %v", err))
 		} else {
 			reportPath := webGen.GetReportPath()
-			fmt.Printf("Web report generated: %s\n", reportPath)
+			subTracker.UpdateSub("保存报告文件")
+			subTracker.CompleteSub(fmt.Sprintf("Web报告已生成: %s", reportPath))
+			reportGenerated = true
 			
 			if openBrowser {
+				tracker.UpdateStepProgress("正在打开浏览器...")
 				openWebReport(reportPath)
 			}
 		}
@@ -175,14 +219,28 @@ func analyzeGitLog(repoPath string) error {
 	
 	// Output text results
 	if outputFile != "" {
+		tracker.UpdateStepProgress("保存文本报告...")
 		err := os.WriteFile(outputFile, []byte(finalReport), 0644)
 		if err != nil {
-			return fmt.Errorf("failed to write output file: %v", err)
+			tracker.UpdateStepProgress(fmt.Sprintf("文本报告保存失败: %v", err))
+		} else {
+			tracker.UpdateStepProgress(fmt.Sprintf("文本报告已保存: %s", outputFile))
+			reportGenerated = true
 		}
-		fmt.Printf("Text report saved to: %s\n", outputFile)
-	} else {
-		fmt.Println(finalReport)
 	}
+	
+	if reportGenerated {
+		tracker.CompleteStep("报告生成完成")
+	} else {
+		tracker.CompleteStep("控制台输出完成")
+		fmt.Println("\n" + strings.Repeat("=", 80))
+		fmt.Println(finalReport)
+		fmt.Println(strings.Repeat("=", 80))
+	}
+	
+	// Complete the entire process
+	tracker.Complete()
+	tracker.ShowSummary(stats)
 	
 	return nil
 }

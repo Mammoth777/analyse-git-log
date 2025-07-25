@@ -3,7 +3,6 @@ package ai
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -123,7 +122,7 @@ func ValidateConfig(config AIConfig) error {
 // AnalyzeWithAI performs AI-powered analysis of git statistics
 func (c *AIClient) AnalyzeWithAI(stats *analyzer.Statistics, basicReport string) (string, error) {
 	prompt := c.buildAnalysisPrompt(stats, basicReport)
-	log.Println("AI analysis request with prompt:", prompt)
+	// log.Println("AI analysis request with prompt:", prompt)
 	return c.sendChatRequest(prompt)
 }
 

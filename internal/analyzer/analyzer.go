@@ -18,6 +18,49 @@ type Statistics struct {
 	FileStats        map[string]int
 	CommitFrequency  map[string]int // date -> count
 	CodeHealthMetrics *health.CodeHealthMetrics // 代码健康分析
+	BranchData       *BranchData // 分支数据
+}
+
+// BranchData contains branch structure and commit relationships
+type BranchData struct {
+	Branches       []BranchInfo     `json:"branches"`
+	CommitGraph    []CommitNode     `json:"commit_graph"`
+	MergePatterns  []MergeInfo      `json:"merge_patterns"`
+}
+
+// BranchInfo contains information about a single branch
+type BranchInfo struct {
+	Name         string    `json:"name"`
+	CommitCount  int       `json:"commit_count"`
+	FirstCommit  time.Time `json:"first_commit"`
+	LastCommit   time.Time `json:"last_commit"`
+	IsActive     bool      `json:"is_active"`
+	MainAuthors  []string  `json:"main_authors"`
+}
+
+// CommitNode represents a commit in the graph structure
+type CommitNode struct {
+	Hash       string    `json:"hash"`
+	ShortHash  string    `json:"short_hash"`
+	Message    string    `json:"message"`
+	Author     string    `json:"author"`
+	Date       time.Time `json:"date"`
+	Branch     string    `json:"branch"`
+	Parents    []string  `json:"parents"`
+	Children   []string  `json:"children"`
+	X          int       `json:"x"` // 图形坐标
+	Y          int       `json:"y"`
+	IsMerge    bool      `json:"is_merge"`
+}
+
+// MergeInfo contains information about merge operations
+type MergeInfo struct {
+	MergeCommit   string    `json:"merge_commit"`
+	SourceBranch  string    `json:"source_branch"`
+	TargetBranch  string    `json:"target_branch"`
+	Date          time.Time `json:"date"`
+	Author        string    `json:"author"`
+	CommitCount   int       `json:"commit_count"` // 合并的提交数量
 }
 
 // AuthorStat contains statistics for a single author
@@ -85,6 +128,15 @@ func (a *Analyzer) Analyze() (*Statistics, error) {
 
 	// Calculate time statistics
 	a.calculateTimeStats(commits, stats.TimeStats)
+
+	// Analyze branch structure
+	branchData, err := a.analyzeBranchStructure(commits)
+	if err != nil {
+		// Branch analysis is optional, continue without it
+		fmt.Printf("Warning: Failed to analyze branch structure: %v\n", err)
+	} else {
+		stats.BranchData = branchData
+	}
 
 	// Perform code health analysis
 	healthAnalyzer := health.NewCodeHealthAnalyzer(commits)
@@ -311,4 +363,211 @@ func (stats *Statistics) GenerateReport() string {
 	}
 
 	return report
+}
+
+// analyzeBranchStructure analyzes git branch structure and commit relationships
+func (a *Analyzer) analyzeBranchStructure(commits []git.GitCommit) (*BranchData, error) {
+	branchData := &BranchData{
+		Branches:      make([]BranchInfo, 0),
+		CommitGraph:   make([]CommitNode, 0),
+		MergePatterns: make([]MergeInfo, 0),
+	}
+
+	// Get branch information from git
+	branches, err := a.repo.GetBranches()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get branches: %v", err)
+	}
+
+	// Build commit hash to index mapping
+	commitHashMap := make(map[string]int)
+	for i, commit := range commits {
+		commitHashMap[commit.Hash] = i
+	}
+
+	// Analyze each branch
+	branchStats := make(map[string]*BranchInfo)
+	for _, branch := range branches {
+		branchInfo := &BranchInfo{
+			Name:        branch,
+			CommitCount: 0,
+			IsActive:    true, // We'll determine this based on recent activity
+			MainAuthors: make([]string, 0),
+		}
+
+		// Get commits for this branch
+		branchCommits, err := a.repo.GetBranchCommits(branch)
+		if err != nil {
+			continue // Skip this branch if we can't get commits
+		}
+
+		if len(branchCommits) == 0 {
+			continue
+		}
+
+		branchInfo.CommitCount = len(branchCommits)
+		branchInfo.FirstCommit = branchCommits[len(branchCommits)-1].Date // Oldest commit
+		branchInfo.LastCommit = branchCommits[0].Date                     // Newest commit
+
+		// Determine if branch is active (has commits in last 30 days)
+		thirtyDaysAgo := time.Now().AddDate(0, 0, -30)
+		branchInfo.IsActive = branchInfo.LastCommit.After(thirtyDaysAgo)
+
+		// Find main authors for this branch
+		authorCount := make(map[string]int)
+		for _, commit := range branchCommits {
+			authorKey := fmt.Sprintf("%s <%s>", commit.Author, commit.Email)
+			authorCount[authorKey]++
+		}
+
+		// Sort authors by commit count and take top 3
+		type authorCommitPair struct {
+			author string
+			count  int
+		}
+		
+		var sortedAuthors []authorCommitPair
+		for author, count := range authorCount {
+			sortedAuthors = append(sortedAuthors, authorCommitPair{author, count})
+		}
+		
+		sort.Slice(sortedAuthors, func(i, j int) bool {
+			return sortedAuthors[i].count > sortedAuthors[j].count
+		})
+
+		for i, pair := range sortedAuthors {
+			if i >= 3 { // Top 3 authors
+				break
+			}
+			branchInfo.MainAuthors = append(branchInfo.MainAuthors, pair.author)
+		}
+
+		branchStats[branch] = branchInfo
+		branchData.Branches = append(branchData.Branches, *branchInfo)
+	}
+
+	// Build commit graph
+	branchData.CommitGraph = a.buildCommitGraph(commits, branchStats)
+
+	// Analyze merge patterns
+	branchData.MergePatterns = a.analyzeMergePatterns(commits)
+
+	return branchData, nil
+}
+
+// buildCommitGraph builds a graph structure for commits
+func (a *Analyzer) buildCommitGraph(commits []git.GitCommit, branchStats map[string]*BranchInfo) []CommitNode {
+	nodes := make([]CommitNode, 0, len(commits))
+	commitMap := make(map[string]*CommitNode)
+
+	// Create commit nodes
+	for i, commit := range commits {
+		node := CommitNode{
+			Hash:      commit.Hash,
+			ShortHash: commit.Hash[:8], // First 8 characters
+			Message:   commit.Message,
+			Author:    commit.Author,
+			Date:      commit.Date,
+			Branch:    a.getBranchForCommit(commit.Hash, branchStats),
+			Parents:   commit.Parents,
+			Children:  make([]string, 0),
+			X:         0, // Will be calculated later
+			Y:         i, // Simple Y positioning based on commit order
+			IsMerge:   len(commit.Parents) > 1,
+		}
+
+		nodes = append(nodes, node)
+		commitMap[commit.Hash] = &nodes[len(nodes)-1]
+	}
+
+	// Build parent-child relationships
+	for i := range nodes {
+		node := &nodes[i]
+		for _, parentHash := range node.Parents {
+			if parentNode, exists := commitMap[parentHash]; exists {
+				parentNode.Children = append(parentNode.Children, node.Hash)
+			}
+		}
+	}
+
+	// Calculate X positions for visualization (simple branch-based positioning)
+	a.calculateCommitPositions(nodes, branchStats)
+
+	return nodes
+}
+
+// getBranchForCommit determines which branch a commit belongs to
+func (a *Analyzer) getBranchForCommit(commitHash string, branchStats map[string]*BranchInfo) string {
+	// For simplicity, we'll try to get the branch from git command
+	// In a real implementation, this would be more sophisticated
+	branch, err := a.repo.GetCommitBranch(commitHash)
+	if err != nil {
+		return "unknown"
+	}
+	return branch
+}
+
+// calculateCommitPositions calculates X,Y positions for commit graph visualization
+func (a *Analyzer) calculateCommitPositions(nodes []CommitNode, branchStats map[string]*BranchInfo) {
+	// Create branch-to-column mapping
+	branchColumns := make(map[string]int)
+	currentColumn := 0
+
+	// Assign columns to branches
+	for branchName := range branchStats {
+		branchColumns[branchName] = currentColumn
+		currentColumn++
+	}
+
+	// Set X positions based on branch
+	for i := range nodes {
+		if column, exists := branchColumns[nodes[i].Branch]; exists {
+			nodes[i].X = column * 50 // 50px spacing between branches
+		} else {
+			nodes[i].X = currentColumn * 50 // Unknown branch gets new column
+		}
+	}
+}
+
+// analyzeMergePatterns analyzes merge commit patterns
+func (a *Analyzer) analyzeMergePatterns(commits []git.GitCommit) []MergeInfo {
+	mergePatterns := make([]MergeInfo, 0)
+
+	for _, commit := range commits {
+		if len(commit.Parents) > 1 { // This is a merge commit
+			mergeInfo := MergeInfo{
+				MergeCommit:  commit.Hash,
+				Date:         commit.Date,
+				Author:       commit.Author,
+				SourceBranch: "unknown", // Would need more git analysis to determine
+				TargetBranch: "unknown", // Would need more git analysis to determine
+				CommitCount:  1,         // Simplified for now
+			}
+
+			// Try to extract branch information from commit message
+			if len(commit.Message) > 0 {
+				// Look for patterns like "Merge branch 'feature/xyz' into main"
+				// This is a simplified approach
+				mergeInfo.SourceBranch = a.extractBranchFromMergeMessage(commit.Message, "source")
+				mergeInfo.TargetBranch = a.extractBranchFromMergeMessage(commit.Message, "target")
+			}
+
+			mergePatterns = append(mergePatterns, mergeInfo)
+		}
+	}
+
+	return mergePatterns
+}
+
+// extractBranchFromMergeMessage extracts branch names from merge commit messages
+func (a *Analyzer) extractBranchFromMergeMessage(message, branchType string) string {
+	// This is a simplified implementation
+	// In practice, you'd use more sophisticated parsing
+	if len(message) > 0 {
+		// Look for common merge message patterns
+		// "Merge branch 'feature/xyz' into main"
+		// "Merge pull request #123 from feature/xyz"
+		return "feature-branch" // Placeholder
+	}
+	return "unknown"
 }

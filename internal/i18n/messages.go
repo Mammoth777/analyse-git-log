@@ -31,6 +31,7 @@ type Messages struct {
 	CommitTimeline          string
 	HourlyActivity          string
 	DailyActivity           string
+	CommitForest            string
 	GeneratedOn             string
 	
 	// Units
@@ -64,6 +65,7 @@ var translations = map[Language]*Messages{
 		CommitTimeline:          "提交时间线",
 		HourlyActivity:          "每小时活动",
 		DailyActivity:           "每日活动",
+		CommitForest:            "提交森林图",
 		GeneratedOn:             "生成时间",
 		
 		Commits:                 "次提交",
@@ -111,6 +113,7 @@ var translations = map[Language]*Messages{
 		CommitTimeline:          "Commit Timeline",
 		HourlyActivity:          "Hourly Activity",
 		DailyActivity:           "Daily Activity",
+		CommitForest:            "Commit Forest",
 		GeneratedOn:             "Generated on",
 		
 		Commits:                 "commits",

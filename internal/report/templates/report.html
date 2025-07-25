@@ -6,6 +6,7 @@
     <title>{{.Messages.ReportTitle}} - {{.ProjectName}}</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
@@ -210,6 +211,47 @@
                 <h3>{{.Messages.DailyActivity}}</h3>
                 <canvas id="dailyChart"></canvas>
             </div>
+
+            {{if .Stats.BranchData}}
+            <div class="chart-container commit-forest-container">
+                <h3>🌲 {{.Messages.CommitForest}}</h3>
+                <div class="forest-controls">
+                    <button id="zoomIn" class="forest-btn">🔍+</button>
+                    <button id="zoomOut" class="forest-btn">🔍-</button>
+                    <button id="resetView" class="forest-btn">⟲</button>
+                    <select id="branchFilter" class="forest-select">
+                        <option value="all">所有分支</option>
+                        {{range .Stats.BranchData.Branches}}
+                        <option value="{{.Name}}">{{.Name}} ({{.CommitCount}})</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="forest-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot commit-dot"></div>
+                        <span>普通提交</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot merge-dot"></div>
+                        <span>合并提交</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line main-line"></div>
+                        <span>主分支</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line feature-line"></div>
+                        <span>功能分支</span>
+                    </div>
+                </div>
+                <svg id="commitForest" class="commit-forest-svg"></svg>
+                <div class="forest-info">
+                    <div class="info-panel" id="commitInfo" style="display: none;">
+                        <div id="commitDetails"></div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
         </div>
 
         <div class="files-section">
@@ -232,9 +274,17 @@
             hourly: {{.HourlyData | toJSON}},
             daily: {{.DailyData | toJSON}},
             timeline: {{.CommitTimeline | toJSON}}
+            {{if .Stats.BranchData}},
+            branchData: {{.Stats.BranchData | toJSON}}
+            {{end}}
         };
         console.log('Report data:', reportData);
         initCharts(reportData);
+        
+        {{if .Stats.BranchData}}
+        // 初始化提交森林图
+        initCommitForest(reportData.branchData);
+        {{end}}
     </script>
 </body>
 </html>

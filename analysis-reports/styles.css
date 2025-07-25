@@ -694,58 +694,77 @@ html {
 }
 
 /* 代码健康检查样式 */
-.health-dashboard {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 32px;
-    margin-bottom: 32px;
-    align-items: start;
-}
-
-.health-score-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 16px;
-    padding: 24px;
-    text-align: center;
-    color: white;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
-}
-
-.score-circle {
+.health-header {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 16px;
+    justify-content: center;
+    margin-bottom: 32px;
 }
 
-.score-value {
-    font-size: 3em;
-    font-weight: 800;
-    line-height: 1;
+.health-score {
+    background: linear-gradient(135deg, #7F7FD5 0%, #86A8E7 50%, #91EAE4 100%);
+    border-radius: 20px;
+    padding: 32px 48px;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(127, 127, 213, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
-.score-max {
-    font-size: 1.2em;
-    font-weight: 500;
-    opacity: 0.8;
+.health-score::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
 }
 
 .score-label {
+    color: white;
     font-size: 1.1em;
     font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.score-description {
-    font-size: 0.9em;
+    margin-bottom: 12px;
     opacity: 0.9;
-    line-height: 1.4;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.health-metrics {
+.score-value {
+    color: white;
+    font-size: 4em;
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.health-summary {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(127, 127, 213, 0.05) 0%, rgba(145, 234, 228, 0.05) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(127, 127, 213, 0.1);
+}
+
+.health-summary p {
+    color: #4a5568;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.health-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
 }
 
 .metric-item {
@@ -793,124 +812,349 @@ html {
 
 .health-card {
     background: white;
-    border-radius: 12px;
-    border: 1px solid rgba(59, 130, 246, 0.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(127, 127, 213, 0.1);
+    box-shadow: 0 8px 24px rgba(127, 127, 213, 0.08);
     overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.health-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(127, 127, 213, 0.15);
+}
+
+.health-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #7F7FD5 0%, #86A8E7 50%, #91EAE4 100%);
+}
+
+.health-card.tech-debt::before {
+    background: linear-gradient(90deg, #ff6b6b 0%, #ffa8a8 100%);
+}
+
+.health-card.refactor::before {
+    background: linear-gradient(90deg, #4ecdc4 0%, #7fdbda 100%);
+}
+
+.health-card.concentration::before {
+    background: linear-gradient(90deg, #ffe66d 0%, #ffeb99 100%);
+}
+
+.health-card.stability::before {
+    background: linear-gradient(90deg, #95e1d3 0%, #b8f5e6 100%);
 }
 
 .health-card .card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    background: rgba(59, 130, 246, 0.05);
-    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 20px 24px 16px;
+    background: rgba(127, 127, 213, 0.02);
+    border-bottom: 1px solid rgba(127, 127, 213, 0.08);
 }
 
 .card-header .card-icon {
-    font-size: 1.2em;
+    font-size: 1.5em;
+    margin-right: 12px;
 }
 
 .card-header .card-title {
     flex: 1;
-    margin-left: 8px;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: 700;
+    color: #2d3748;
+    font-size: 1.1em;
 }
 
-.card-badge {
-    background: #3b82f6;
+.card-count {
+    background: linear-gradient(135deg, #7F7FD5 0%, #86A8E7 100%);
     color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.8em;
-    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(127, 127, 213, 0.3);
 }
 
 .health-card .card-content {
-    padding: 16px 20px;
+    padding: 20px 24px 24px;
 }
 
-.issue-item {
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(59, 130, 246, 0.08);
+/* 技术债务热点样式 */
+.hotspot-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(127, 127, 213, 0.08);
+    transition: background-color 0.2s ease;
 }
 
-.issue-item:last-child {
+.hotspot-item:hover {
+    background: rgba(127, 127, 213, 0.02);
+    margin: 0 -24px;
+    padding: 16px 24px;
+    border-radius: 8px;
+}
+
+.hotspot-item:last-child {
     border-bottom: none;
 }
 
-.issue-file {
+.hotspot-file {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
 }
 
-.file-icon {
-    font-size: 0.9em;
+.hotspot-file::before {
+    content: '📄';
+    margin-right: 8px;
 }
 
-.file-path {
-    font-family: 'Monaco', 'Menlo', monospace;
-    font-size: 0.85em;
-    color: #374151;
-    font-weight: 600;
-}
-
-.issue-metrics {
+.hotspot-details {
     display: flex;
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.issue-badge {
-    padding: 2px 6px;
-    border-radius: 8px;
+.risk-score, .mod-count {
+    padding: 4px 8px;
+    border-radius: 12px;
     font-size: 0.75em;
     font-weight: 600;
 }
 
-.issue-badge.risk {
-    background: rgba(239, 68, 68, 0.1);
-    color: #dc2626;
+.risk-score {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+    color: white;
 }
 
-.issue-badge.freq {
-    background: rgba(245, 158, 11, 0.1);
-    color: #d97706;
+.mod-count {
+    background: linear-gradient(135deg, #ffa726 0%, #ffcc80 100%);
+    color: white;
 }
 
-.issue-badge.signal {
-    background: rgba(59, 130, 246, 0.1);
-    color: #2563eb;
-}
-
-.issue-badge.changes {
-    background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-}
-
-.issue-reason {
+.reason {
+    color: #718096;
     font-size: 0.8em;
-    color: #6b7280;
     font-style: italic;
+    flex: 1;
+}
+
+/* 重构信号样式 */
+.signal-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(127, 127, 213, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.signal-item:hover {
+    background: rgba(127, 127, 213, 0.02);
+    margin: 0 -24px;
+    padding: 16px 24px;
+    border-radius: 8px;
+}
+
+.signal-item:last-child {
+    border-bottom: none;
+}
+
+.signal-file {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.signal-file::before {
+    content: '🔧';
+    margin-right: 8px;
+}
+
+.signal-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.signal-strength, .changes-count, .time-window {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.signal-strength {
+    background: linear-gradient(135def, #4ecdc4 0%, #7fdbda 100%);
+    color: white;
+}
+
+.changes-count {
+    background: linear-gradient(135deg, #66bb6a 0%, #a5d6a7 100%);
+    color: white;
+}
+
+.time-window {
+    background: linear-gradient(135deg, #ab47bc 0%, #ce93d8 100%);
+    color: white;
+}
+
+/* 代码集中度样式 */
+.concentration-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(127, 127, 213, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.concentration-item:hover {
+    background: rgba(127, 127, 213, 0.02);
+    margin: 0 -24px;
+    padding: 16px 24px;
+    border-radius: 8px;
+}
+
+.concentration-item:last-child {
+    border-bottom: none;
+}
+
+.concentration-file {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.concentration-file::before {
+    content: '⚠️';
+    margin-right: 8px;
+}
+
+.concentration-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.concentration-level, .change-ratio, .total-changes {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.concentration-level {
+    background: linear-gradient(135deg, #ffe66d 0%, #ffeb99 100%);
+    color: #8b5000;
+}
+
+.change-ratio {
+    background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+    color: white;
+}
+
+.total-changes {
+    background: linear-gradient(135deg, #e57373 0%, #ffab91 100%);
+    color: white;
+}
+
+/* 稳定性指标样式 */
+.stability-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(127, 127, 213, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.stability-item:hover {
+    background: rgba(127, 127, 213, 0.02);
+    margin: 0 -24px;
+    padding: 16px 24px;
+    border-radius: 8px;
+}
+
+.stability-item:last-child {
+    border-bottom: none;
+}
+
+.stability-file {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.stability-file::before {
+    content: '🛡️';
+    margin-right: 8px;
+}
+
+.stability-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stability-level, .change-rate, .defect-density {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.stability-level {
+    background: linear-gradient(135deg, #95e1d3 0%, #b8f5e6 100%);
+    color: #00695c;
+}
+
+.stability-level.high {
+    background: linear-gradient(135deg, #81c784 0%, #a5d6a7 100%);
+    color: #2e7d32;
+}
+
+.stability-level.low {
+    background: linear-gradient(135deg, #ffab91 0%, #ffcc80 100%);
+    color: #e65100;
+}
+
+.change-rate {
+    background: linear-gradient(135deg, #64b5f6 0%, #90caf9 100%);
+    color: white;
+}
+
+.defect-density {
+    background: linear-gradient(135deg, #ba68c8 0%, #ce93d8 100%);
+    color: white;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-    .health-dashboard {
+    .health-cards {
         grid-template-columns: 1fr;
         gap: 20px;
     }
     
-    .health-metrics {
-        grid-template-columns: 1fr;
+    .health-score {
+        padding: 24px 32px;
     }
     
-.health-details {
-    grid-template-columns: 1fr;
+    .score-value {
+        font-size: 3em;
+    }
 }
 
 /* 提交森林图样式 */
@@ -972,7 +1216,8 @@ html {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     font-size: 0.85em;
 }
-}/* 贡献者卡片网格 - 精致设计 */
+
+/* 贡献者卡片网格 - 精致设计 */
 .contributor-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

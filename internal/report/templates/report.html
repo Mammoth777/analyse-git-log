@@ -305,13 +305,13 @@
                 {{if .CodeHealthMetrics}}
                 <div class="health-header">
                     <div class="health-score">
-                        <span class="score-label">健康评分:</span>
-                        <span class="score-value">{{printf "%.0f" (mul .CodeHealthMetrics.HealthScore 100)}}/100</span>
+                        <span class="score-label">健康评分</span>
+                        <span class="score-value">{{printf "%.0f" (mul .CodeHealthMetrics.HealthScore 100)}}</span>
                     </div>
                 </div>
 
                 <div class="health-summary">
-                    <p>{{.CodeHealthMetrics.HealthSummary}}</p>
+                    <p>{{.CodeHealthMetrics.HealthSummary}} (满分100分)</p>
                 </div>
 
                 <div class="health-cards">

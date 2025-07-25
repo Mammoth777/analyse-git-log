@@ -182,7 +182,13 @@
                 <div class="authors-list">
                     {{range .TopAuthors}}
                     <div class="author-item">
+                        {{if hasDeveloperProfile .Name $.DeveloperProfiles}}
+                        <a href="{{getDeveloperProfileLink .Name $.DeveloperProfiles}}" class="author-name-link">
+                            <span class="author-name">{{.Name}}</span>
+                        </a>
+                        {{else}}
                         <span class="author-name">{{.Name}}</span>
+                        {{end}}
                         <span class="author-stats">{{.CommitCount}} {{$.Messages.Commits}} ({{printf "%.1f" .Percentage}}%)</span>
                         <span class="author-changes">+{{.Additions}}/-{{.Deletions}}</span>
                     </div>

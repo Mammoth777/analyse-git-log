@@ -12,6 +12,7 @@ import (
 
 	"git-log-analyzer/internal/ai"
 	"git-log-analyzer/internal/analyzer"
+	"git-log-analyzer/internal/developer"
 	"git-log-analyzer/internal/progress"
 	"git-log-analyzer/internal/report"
 )
@@ -108,9 +109,9 @@ func analyzeGitLog(repoPath string) error {
 	}
 	
 	// Initialize progress tracker (using custom implementation)
-	totalSteps := 3 // Git分析、报告生成、输出
+	totalSteps := 4 // Git分析、开发者分析、报告生成、输出
 	if useAI {
-		totalSteps = 4 // 增加AI分析步骤
+		totalSteps = 5 // 增加AI分析步骤
 	}
 	
 	tracker := progress.NewProgressTracker(totalSteps, true)
@@ -154,10 +155,48 @@ func analyzeGitLog(repoPath string) error {
 	basicReport := stats.GenerateReport()
 	tracker.CompleteStep("Git日志分析完成")
 	
+	time.Sleep(300 * time.Millisecond) // 让用户看到完成状态
+	
+	// Step 3: Developer Profile Analysis
+	tracker.StartStep("开发者风格画像分析")
+	tracker.UpdateStepProgress("初始化开发者分析器...")
+	
+	profileAnalyzer := developer.NewProfileAnalyzer(stats)
+	
+	// Analyze top contributors (limit to top 10 for performance)
+	var developerProfiles []*developer.DeveloperProfile
+	contributorCount := len(stats.AuthorStats)
+	if contributorCount > 10 {
+		contributorCount = 10
+	}
+	
+	idx := 0
+	for authorName, authorStat := range stats.AuthorStats {
+		if idx >= contributorCount {
+			break
+		}
+		tracker.UpdateStepProgress(fmt.Sprintf("分析开发者: %s (%d/%d)", authorName, idx+1, contributorCount))
+		profile := profileAnalyzer.AnalyzeDeveloper(authorStat)
+		developerProfiles = append(developerProfiles, profile)
+		idx++
+	}
+	
+	tracker.CompleteStep(fmt.Sprintf("开发者风格画像分析完成 (%d位开发者)", len(developerProfiles)))
+	
+	// Generate developer profiles report
+	var developerReport strings.Builder
+	if len(developerProfiles) > 0 {
+		developerReport.WriteString("\n\n=== 🎭 开发者风格画像分析 ===\n")
+		for _, profile := range developerProfiles {
+			developerReport.WriteString(profile.GenerateReport())
+			developerReport.WriteString("\n")
+		}
+	}
+
 	var finalReport string
 	var aiAnalysis string
 	
-	// Step 3: AI Analysis (if enabled)
+	// Step 4: AI Analysis (if enabled)
 	if useAI {
 		tracker.StartStep("AI智能分析")
 		tracker.UpdateStepProgress("初始化AI客户端...")
@@ -165,25 +204,25 @@ func analyzeGitLog(repoPath string) error {
 		aiClient, err := ai.NewAIClient()
 		if err != nil {
 			tracker.CompleteStepWithWarning("AI分析跳过", fmt.Sprintf("AI客户端初始化失败: %v", err))
-			finalReport = basicReport
+			finalReport = basicReport + developerReport.String()
 		} else {
 			tracker.UpdateStepProgress("发送分析请求到AI服务...")
 			aiResult, err := aiClient.AnalyzeWithAI(stats, basicReport)
 			if err != nil {
 				tracker.CompleteStepWithWarning("AI分析跳过", fmt.Sprintf("AI分析失败: %v", err))
-				finalReport = basicReport
+				finalReport = basicReport + developerReport.String()
 			} else {
 				tracker.UpdateStepProgress("AI分析响应处理完成")
 				aiAnalysis = aiResult
-				finalReport = basicReport + "\n\n=== AI-Powered Analysis ===\n" + aiAnalysis
+				finalReport = basicReport + developerReport.String() + "\n\n=== AI-Powered Analysis ===\n" + aiAnalysis
 				tracker.CompleteStep("AI智能分析完成")
 			}
 		}
 	} else {
-		finalReport = basicReport
+		finalReport = basicReport + developerReport.String()
 	}
 	
-	// Step 4: Report Generation
+	// Step 5: Report Generation
 	tracker.StartStep("报告生成与输出")
 	
 	reportGenerated := false
@@ -201,7 +240,7 @@ func analyzeGitLog(repoPath string) error {
 		subTracker.UpdateSub("准备报告数据")
 		subTracker.UpdateSub("渲染HTML模板")
 		
-		err := webGen.GenerateReport(stats, aiAnalysis, projectName)
+		err := webGen.GenerateReport(stats, aiAnalysis, projectName, developerProfiles)
 		if err != nil {
 			tracker.UpdateStepProgress(fmt.Sprintf("Web报告生成失败: %v", err))
 		} else {

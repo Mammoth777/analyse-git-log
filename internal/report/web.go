@@ -8,15 +8,20 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"git-log-analyzer/internal/analyzer"
+	"git-log-analyzer/internal/developer"
 	"git-log-analyzer/internal/health"
 	"git-log-analyzer/internal/i18n"
 )
 
 //go:embed templates/report.html
 var htmlTemplate string
+
+//go:embed templates/developer-profile.html
+var developerProfileTemplate string
 
 //go:embed templates/styles.css
 var cssTemplate string
@@ -38,18 +43,19 @@ func NewWebReportGenerator(outputDir string) *WebReportGenerator {
 
 // ReportData contains all data for web report
 type ReportData struct {
-	GeneratedAt       time.Time
-	ProjectName       string
-	Stats             *analyzer.Statistics
-	TopAuthors        []AuthorData
-	HourlyData        []HourData
-	DailyData         []DayData
-	FileData          []FileData
-	CommitTimeline    []TimelineData
-	AIAnalysis        string
-	CodeHealthMetrics *health.CodeHealthMetrics
-	Messages          *i18n.Messages
-	Language          i18n.Language
+	GeneratedAt         time.Time
+	ProjectName         string
+	Stats               *analyzer.Statistics
+	TopAuthors          []AuthorData
+	HourlyData          []HourData
+	DailyData           []DayData
+	FileData            []FileData
+	CommitTimeline      []TimelineData
+	AIAnalysis          string
+	CodeHealthMetrics   *health.CodeHealthMetrics
+	DeveloperProfiles   []*developer.DeveloperProfile
+	Messages            *i18n.Messages
+	Language            i18n.Language
 }
 
 // AuthorData represents author statistics for web display
@@ -86,17 +92,22 @@ type TimelineData struct {
 }
 
 // GenerateReport generates a complete HTML report
-func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalysis string, projectName string) error {
+func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalysis string, projectName string, developerProfiles []*developer.DeveloperProfile) error {
 	// Create output directory
 	if err := os.MkdirAll(w.outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create output directory: %v", err)
 	}
 
 	// Prepare report data
-	reportData := w.prepareReportData(stats, aiAnalysis, projectName)
+	reportData := w.prepareReportData(stats, aiAnalysis, projectName, developerProfiles)
 
 	// Generate HTML report
 	if err := w.generateHTMLReport(reportData); err != nil {
+		return err
+	}
+
+	// Generate developer profile pages
+	if err := w.generateDeveloperProfilePages(reportData); err != nil {
 		return err
 	}
 
@@ -114,7 +125,7 @@ func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalys
 }
 
 // prepareReportData prepares data for web report
-func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, projectName string) *ReportData {
+func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, projectName string, developerProfiles []*developer.DeveloperProfile) *ReportData {
 	lang := i18n.GetLanguage()
 	msg := i18n.GetMessages(lang)
 	
@@ -124,6 +135,7 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 		Stats:             stats,
 		AIAnalysis:        aiAnalysis,
 		CodeHealthMetrics: stats.CodeHealthMetrics,
+		DeveloperProfiles: developerProfiles,
 		Messages:          msg,
 		Language:          lang,
 	}
@@ -266,6 +278,25 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
 		"mul": func(a, b float64) float64 {
 			return a * b
 		},
+		"printf": func(format string, v ...interface{}) string {
+			return fmt.Sprintf(format, v...)
+		},
+		"getDeveloperProfileLink": func(authorName string, profiles []*developer.DeveloperProfile) string {
+			for _, profile := range profiles {
+				if profile.Name == authorName {
+					return fmt.Sprintf("developer-%s.html", sanitizeFilename(profile.Name))
+				}
+			}
+			return ""
+		},
+		"hasDeveloperProfile": func(authorName string, profiles []*developer.DeveloperProfile) bool {
+			for _, profile := range profiles {
+				if profile.Name == authorName {
+					return true
+				}
+			}
+			return false
+		},
 	}
 
 	// Read HTML template from embedded content
@@ -281,6 +312,77 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
 	defer file.Close()
 
 	return t.Execute(file, data)
+}
+
+// generateDeveloperProfilePages generates individual developer profile pages
+func (w *WebReportGenerator) generateDeveloperProfilePages(data *ReportData) error {
+	if len(data.DeveloperProfiles) == 0 {
+		return nil
+	}
+
+	// Create template functions
+	funcMap := template.FuncMap{
+		"mul": func(a, b float64) float64 {
+			return a * b
+		},
+		"printf": func(format string, v ...interface{}) string {
+			return fmt.Sprintf(format, v...)
+		},
+	}
+
+	// Parse developer profile template
+	t, err := template.New("developer-profile").Funcs(funcMap).Parse(developerProfileTemplate)
+	if err != nil {
+		return fmt.Errorf("failed to parse developer profile template: %v", err)
+	}
+
+	// Generate a page for each developer profile
+	for _, profile := range data.DeveloperProfiles {
+		// Create profile data structure
+		profileData := struct {
+			DeveloperProfile *developer.DeveloperProfile
+			Language         i18n.Language
+		}{
+			DeveloperProfile: profile,
+			Language:         data.Language,
+		}
+
+		// Create filename based on developer name (sanitized)
+		filename := fmt.Sprintf("developer-%s.html", sanitizeFilename(profile.Name))
+		filePath := filepath.Join(w.outputDir, filename)
+
+		file, err := os.Create(filePath)
+		if err != nil {
+			return fmt.Errorf("failed to create developer profile file %s: %v", filename, err)
+		}
+
+		err = t.Execute(file, profileData)
+		file.Close()
+
+		if err != nil {
+			return fmt.Errorf("failed to generate developer profile for %s: %v", profile.Name, err)
+		}
+	}
+
+	return nil
+}
+
+// sanitizeFilename sanitizes a string to be safe for use as a filename
+func sanitizeFilename(name string) string {
+	// Replace common problematic characters
+	result := name
+	result = strings.ReplaceAll(result, " ", "-")
+	result = strings.ReplaceAll(result, "@", "-at-")
+	result = strings.ReplaceAll(result, "/", "-")
+	result = strings.ReplaceAll(result, "\\", "-")
+	result = strings.ReplaceAll(result, ":", "-")
+	result = strings.ReplaceAll(result, "*", "-")
+	result = strings.ReplaceAll(result, "?", "-")
+	result = strings.ReplaceAll(result, "\"", "-")
+	result = strings.ReplaceAll(result, "<", "-")
+	result = strings.ReplaceAll(result, ">", "-")
+	result = strings.ReplaceAll(result, "|", "-")
+	return result
 }
 
 // generateCSS generates the CSS file for the report

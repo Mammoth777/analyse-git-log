@@ -172,11 +172,17 @@
 
                 <div class="files-section">
                     <h3>{{.Messages.MostModifiedFiles}}</h3>
-                    <div class="files-grid">
+                    <div class="chart-container medium">
+                        <canvas id="filesChart"></canvas>
+                    </div>
+                    <div class="files-list">
                         {{range .FileData}}
                         <div class="file-item">
                             <span class="file-name">{{.Name}}</span>
-                            <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
+                            <div class="file-bar">
+                                <div class="file-bar-fill" data-count="{{.Count}}"></div>
+                                <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
+                            </div>
                         </div>
                         {{end}}
                     </div>
@@ -189,23 +195,44 @@
                     <h2>👥 贡献者分析</h2>
                     <p>开发者贡献统计和活跃度分析</p>
                 </div>
-                <div class="chart-container">
-                    <h3>{{.Messages.TopContributors}}</h3>
-                    <canvas id="authorsChart"></canvas>
-                    <div class="authors-list">
-                        {{range .TopAuthors}}
-                        <div class="author-item">
-                            {{if hasDeveloperProfile .Name $.DeveloperProfiles}}
-                            <a href="{{getDeveloperProfileLink .Name $.DeveloperProfiles}}" class="author-name-link">
-                                <span class="author-name">{{.Name}}</span>
-                            </a>
-                            {{else}}
-                            <span class="author-name">{{.Name}}</span>
-                            {{end}}
-                            <span class="author-stats">{{.CommitCount}} {{$.Messages.Commits}} ({{printf "%.1f" .Percentage}}%)</span>
-                            <span class="author-changes">+{{.Additions}}/-{{.Deletions}}</span>
+                <div class="section-content">
+                    <div class="contributors-layout">
+                        <div class="contributors-chart">
+                            <h3>{{.Messages.TopContributors}}</h3>
+                            <canvas id="authorsChart"></canvas>
                         </div>
-                        {{end}}
+                        <div class="contributors-list">
+                            <h3>详细统计</h3>
+                            <div class="authors-list">
+                                {{range .TopAuthors}}
+                                <div class="author-item">
+                                    <div class="author-info">
+                                        {{if hasDeveloperProfile .Name $.DeveloperProfiles}}
+                                        <a href="{{getDeveloperProfileLink .Name $.DeveloperProfiles}}" class="author-name-link">
+                                            <span class="author-name">{{.Name}}</span>
+                                        </a>
+                                        {{else}}
+                                        <span class="author-name">{{.Name}}</span>
+                                        {{end}}
+                                        <div class="author-metrics">
+                                            <div class="metric">
+                                                <span class="metric-label">提交数</span>
+                                                <span class="metric-value">{{.CommitCount}}</span>
+                                            </div>
+                                            <div class="metric">
+                                                <span class="metric-label">占比</span>
+                                                <span class="metric-value">{{printf "%.1f" .Percentage}}%</span>
+                                            </div>
+                                            <div class="metric">
+                                                <span class="metric-label">增删行</span>
+                                                <span class="metric-value">+{{.Additions}}/-{{.Deletions}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{end}}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -216,18 +243,23 @@
                     <h2>⏰ 活动时间分析</h2>
                     <p>提交活动的时间模式和频率分析</p>
                 </div>
-                <div class="charts-grid">
-                    <div class="chart-container">
+                <div class="section-content">
+                    <!-- 时间线图表 - 全宽显示 -->
+                    <div class="chart-container full-width">
                         <h3>{{.Messages.CommitTimeline}}</h3>
                         <canvas id="timelineChart"></canvas>
                     </div>
-                    <div class="chart-container">
-                        <h3>{{.Messages.HourlyActivity}}</h3>
-                        <canvas id="hourlyChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>{{.Messages.DailyActivity}}</h3>
-                        <canvas id="dailyChart"></canvas>
+                    
+                    <!-- 小时和日活跃度 - 双列显示 -->
+                    <div class="charts-grid-2">
+                        <div class="chart-container medium">
+                            <h3>{{.Messages.HourlyActivity}}</h3>
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                        <div class="chart-container medium">
+                            <h3>{{.Messages.DailyActivity}}</h3>
+                            <canvas id="dailyChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -238,50 +270,34 @@
                     <h2>🌲 分支结构</h2>
                     <p>Git分支和提交的可视化分析</p>
                 </div>
-                {{if .Stats.BranchData}}
-                <div class="chart-container commit-forest-container">
-                    <h3>🌲 {{.Messages.CommitForest}}</h3>
-                    <div class="forest-controls">
-                        <button id="zoomIn" class="forest-btn">🔍+</button>
-                        <button id="zoomOut" class="forest-btn">🔍-</button>
-                        <button id="resetView" class="forest-btn">⟲</button>
-                        <select id="branchFilter" class="forest-select">
-                            <option value="all">所有分支</option>
-                            {{range .Stats.BranchData.Branches}}
-                            <option value="{{.Name}}">{{.Name}} ({{.CommitCount}})</option>
-                            {{end}}
-                        </select>
-                    </div>
-                    <div class="forest-legend">
-                        <div class="legend-item">
-                            <div class="legend-dot commit-dot"></div>
-                            <span>普通提交</span>
+                <div class="section-content">
+                    {{if .Stats.BranchData}}
+                    <div class="chart-container full-width commit-forest-container">
+                        <h3>🌲 {{.Messages.CommitForest}}</h3>
+                        <div class="forest-controls">
+                            <button id="zoomIn" class="forest-btn">🔍+</button>
+                            <button id="zoomOut" class="forest-btn">🔍-</button>
+                            <button id="resetView" class="forest-btn">⟲</button>
+                            <select id="branchFilter" class="forest-select">
+                                <option value="all">所有分支</option>
+                                {{range .Stats.BranchData.Branches}}
+                                <option value="{{.Name}}">{{.Name}} ({{.CommitCount}})</option>
+                                {{end}}
+                            </select>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-dot merge-dot"></div>
-                            <span>合并提交</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-line main-line"></div>
-                            <span>主分支</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-line feature-line"></div>
-                            <span>功能分支</span>
+                        <svg id="commitForest" class="commit-forest-svg" width="100%" height="500"></svg>
+                        <div class="forest-info">
+                            <div class="info-panel" id="commitInfo" style="display: none;">
+                                <div id="commitDetails"></div>
+                            </div>
                         </div>
                     </div>
-                    <svg id="commitForest" class="commit-forest-svg"></svg>
-                    <div class="forest-info">
-                        <div class="info-panel" id="commitInfo" style="display: none;">
-                            <div id="commitDetails"></div>
-                        </div>
+                    {{else}}
+                    <div class="no-data">
+                        <p>{{.Messages.NoDataAvailable}}</p>
                     </div>
+                    {{end}}
                 </div>
-                {{else}}
-                <div class="empty-section">
-                    <p>未检测到分支数据，或当前仓库只有单一分支</p>
-                </div>
-                {{end}}
             </section>
 
             <!-- 代码健康 -->
@@ -648,7 +664,8 @@
             authors: {{.TopAuthors | toJSON}},
             hourly: {{.HourlyData | toJSON}},
             daily: {{.DailyData | toJSON}},
-            timeline: {{.CommitTimeline | toJSON}}
+            timeline: {{.CommitTimeline | toJSON}},
+            files: {{.FileData | toJSON}}
             {{if .Stats.BranchData}},
             branchData: {{.Stats.BranchData | toJSON}}
             {{end}}
@@ -658,10 +675,32 @@
         // 初始化图表
         initCharts(reportData);
         
+        // 初始化文件条形图百分比
+        initFileBarChart();
+        
         {{if .Stats.BranchData}}
         // 初始化提交森林图
         initCommitForest(reportData.branchData);
         {{end}}
+
+        // 初始化文件条形图百分比显示
+        function initFileBarChart() {
+            const fileBars = document.querySelectorAll('.file-bar-fill');
+            let maxCount = 0;
+            
+            // 找到最大值
+            fileBars.forEach(bar => {
+                const count = parseInt(bar.getAttribute('data-count'));
+                maxCount = Math.max(maxCount, count);
+            });
+            
+            // 设置宽度百分比
+            fileBars.forEach(bar => {
+                const count = parseInt(bar.getAttribute('data-count'));
+                const percentage = maxCount > 0 ? (count / maxCount * 100) : 0;
+                bar.style.width = percentage + '%';
+            });
+        }
 
         // 移动端菜单切换功能
         function toggleMobileMenu() {

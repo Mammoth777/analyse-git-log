@@ -153,6 +153,9 @@ function initCharts(data) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 800
+                },
                 plugins: {
                     legend: {
                         position: 'bottom'
@@ -253,6 +256,51 @@ function initCharts(data) {
         });
     } else {
         console.warn('Daily chart: No data or element not found');
+    }
+
+    // Files chart
+    const filesCtx = document.getElementById('filesChart');
+    if (filesCtx && data.files && data.files.length > 0) {
+        new Chart(filesCtx, {
+            type: 'bar',
+            data: {
+                labels: data.files.slice(0, 10).map(f => f.Name.split('/').pop()), // 只显示文件名
+                datasets: [{
+                    label: '修改次数',
+                    data: data.files.slice(0, 10).map(f => f.Count),
+                    backgroundColor: [
+                        '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                        '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                        '#ffecd2', '#fcb69f'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // 水平条形图
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const index = context[0].dataIndex;
+                                return data.files[index].Name; // 显示完整路径
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        console.warn('Files chart: No data or element not found');
     }
 }
 

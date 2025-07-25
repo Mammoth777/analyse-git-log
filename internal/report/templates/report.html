@@ -174,12 +174,11 @@
                     <h3>{{.Messages.MostModifiedFiles}}</h3>
                     <div class="files-list">
                         {{range .FileData}}
-                        <div class="file-item">
-                            <span class="file-name">{{.Name}}</span>
-                            <div class="file-bar">
-                                <div class="file-bar-fill" data-count="{{.Count}}"></div>
-                                <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
+                        <div class="file-bar">
+                            <div class="file-bar-fill" data-count="{{.Count}}">
+                                <span class="file-name">{{.Name}}</span>
                             </div>
+                            <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
                         </div>
                         {{end}}
                     </div>

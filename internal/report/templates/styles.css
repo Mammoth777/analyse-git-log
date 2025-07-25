@@ -9,12 +9,317 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
 }
 
-.container {
+/* 移动端菜单切换按钮 */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    transition: all 0.3s ease;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.mobile-menu-toggle span {
+    width: 20px;
+    height: 2px;
+    background: white;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+/* 悬浮的左侧菜单样式 */
+.sidebar-floating {
+    width: 280px;
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    position: fixed;
+    top: 10%;
+    left: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.sidebar-floating:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+}
+
+/* 自定义滚动条 */
+.sidebar-floating::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-floating::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+}
+
+.sidebar-floating::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+}
+
+.sidebar-floating::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+.sidebar-header {
+    padding: 20px 15px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.sidebar-header h3 {
+    font-size: 1.2em;
+    margin: 0;
+    font-weight: 600;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 15px 0;
+    margin: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    position: relative;
+}
+
+.menu-item:hover {
+    background: rgba(255,255,255,0.1);
+    border-left-color: #3498db;
+}
+
+.menu-item.active {
+    background: rgba(52, 152, 219, 0.3);
+    border-left-color: #3498db;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+}
+
+.menu-item.active::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 60%;
+    background: linear-gradient(180deg, #3498db, #2980b9);
+    border-radius: 0 3px 3px 0;
+}
+
+.menu-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.menu-item.disabled:hover {
+    background: none;
+    border-left-color: transparent;
+}
+
+.menu-item .icon {
+    font-size: 1.2em;
+    margin-right: 12px;
+    width: 24px;
+    text-align: center;
+}
+
+.menu-item span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.menu-item small {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+}
+
+/* 主内容区域 */
+.main-content {
+    width: 100%;
+    padding: 0;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+}
+
+.main-content > * {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 内容区域样式 */
+.content-section {
+    display: block;
+    padding: 60px 40px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    scroll-margin-top: 20px;
+}
+
+.content-section:first-of-type {
+    padding-top: 40px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.section-header h2 {
+    font-size: 2em;
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+
+.section-header p {
+    color: #6c757d;
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* 空白功能区域样式 */
+.empty-section {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.coming-soon {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.coming-soon .icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.coming-soon h3 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.coming-soon p {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+.feature-list li {
+    padding: 5px 0;
+    color: #6c757d;
+    font-size: 0.95em;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .sidebar-floating {
+        width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    .sidebar-floating {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        max-height: 50vh;
+        border-radius: 0 0 16px 16px;
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar-floating.mobile-open {
+        transform: translateY(0);
+    }
+    
+    .content-section {
+        padding: 40px 20px;
+        margin-top: 60px;
+    }
+    
+    .sidebar-menu {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+        padding: 10px;
+    }
+    
+    .menu-item {
+        padding: 12px 15px;
+        text-align: center;
+        border-radius: 8px;
+    }
+}
+        padding: 10px 5px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+    }
+    
+    .menu-item:hover,
+    .menu-item.active {
+        border-left: none;
+        border-bottom-color: #3498db;
+    }
+    
+    .menu-item.active::before {
+        display: none;
+    }
 }
 
 .header {
@@ -22,8 +327,8 @@ body {
     margin-bottom: 30px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 30px;
-    border-radius: 10px;
+    padding: 40px 30px;
+    border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 

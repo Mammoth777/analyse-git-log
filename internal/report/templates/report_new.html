@@ -10,68 +10,62 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- 移动端菜单切换按钮 -->
-    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
+    <div class="container">
+        <!-- 左侧菜单 -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>📊 分析维度</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="overview">
+                    <i class="icon">📈</i>
+                    <span>项目概览</span>
+                </li>
+                <li class="menu-item" data-section="contributors">
+                    <i class="icon">👥</i>
+                    <span>贡献者分析</span>
+                </li>
+                <li class="menu-item" data-section="activity">
+                    <i class="icon">⏰</i>
+                    <span>活动时间分析</span>
+                </li>
+                <li class="menu-item" data-section="branch">
+                    <i class="icon">🌲</i>
+                    <span>分支结构</span>
+                </li>
+                <li class="menu-item" data-section="health">
+                    <i class="icon">🏥</i>
+                    <span>代码健康</span>
+                </li>
+                <li class="menu-item" data-section="ai">
+                    <i class="icon">🤖</i>
+                    <span>AI 分析</span>
+                </li>
+                <li class="menu-item disabled" data-section="security">
+                    <i class="icon">🔒</i>
+                    <span>安全分析</span>
+                    <small>即将上线</small>
+                </li>
+                <li class="menu-item disabled" data-section="performance">
+                    <i class="icon">⚡</i>
+                    <span>性能分析</span>
+                    <small>即将上线</small>
+                </li>
+                <li class="menu-item disabled" data-section="dependencies">
+                    <i class="icon">📦</i>
+                    <span>依赖分析</span>
+                    <small>即将上线</small>
+                </li>
+                <li class="menu-item disabled" data-section="quality">
+                    <i class="icon">⭐</i>
+                    <span>代码质量</span>
+                    <small>即将上线</small>
+                </li>
+            </ul>
+        </nav>
 
-    <!-- 固定悬浮的左侧菜单 -->
-    <nav class="sidebar-floating">
-        <div class="sidebar-header">
-            <h3>📊 分析维度</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li class="menu-item active" data-section="overview">
-                <i class="icon">📈</i>
-                <span>项目概览</span>
-            </li>
-            <li class="menu-item" data-section="contributors">
-                <i class="icon">👥</i>
-                <span>贡献者分析</span>
-            </li>
-            <li class="menu-item" data-section="activity">
-                <i class="icon">⏰</i>
-                <span>活动时间分析</span>
-            </li>
-            <li class="menu-item" data-section="branch">
-                <i class="icon">🌲</i>
-                <span>分支结构</span>
-            </li>
-            <li class="menu-item" data-section="health">
-                <i class="icon">🏥</i>
-                <span>代码健康</span>
-            </li>
-            <li class="menu-item" data-section="ai">
-                <i class="icon">🤖</i>
-                <span>AI 分析</span>
-            </li>
-            <li class="menu-item disabled" data-section="security">
-                <i class="icon">🔒</i>
-                <span>安全分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="performance">
-                <i class="icon">⚡</i>
-                <span>性能分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="dependencies">
-                <i class="icon">📦</i>
-                <span>依赖分析</span>
-                <small>即将上线</small>
-            </li>
-            <li class="menu-item disabled" data-section="quality">
-                <i class="icon">⭐</i>
-                <span>代码质量</span>
-                <small>即将上线</small>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- 主内容区域 -->
-    <main class="main-content">
+        <!-- 主内容区域 -->
+        <main class="main-content">
             <header class="header">
                 <h1>{{.Messages.ReportTitle}}</h1>
                 <div class="subtitle">
@@ -81,7 +75,7 @@
             </header>
 
             <!-- 项目概览 -->
-            <section id="overview-section" class="content-section">
+            <section id="overview-section" class="content-section active">
                 <div class="section-header">
                     <h2>📈 项目概览</h2>
                     <p>项目的基本统计信息和整体概况</p>
@@ -446,6 +440,7 @@
                 </div>
             </section>
         </main>
+    </div>
 
     <script src="charts.js"></script>
     <script>
@@ -468,77 +463,30 @@
         initCommitForest(reportData.branchData);
         {{end}}
 
-        // 移动端菜单切换功能
-        function toggleMobileMenu() {
-            const sidebar = document.querySelector('.sidebar-floating');
-            sidebar.classList.toggle('mobile-open');
-        }
-
         // 侧边栏菜单功能
         document.addEventListener('DOMContentLoaded', function() {
             const menuItems = document.querySelectorAll('.menu-item');
             const sections = document.querySelectorAll('.content-section');
 
-            // 平滑滚动到目标section
-            function scrollToSection(sectionId) {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }
-
-            // 更新活动菜单项
-            function updateActiveMenuItem(activeSection) {
-                menuItems.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-section') === activeSection) {
-                        item.classList.add('active');
-                    }
-                });
-            }
-
-            // 点击菜单项时滚动到对应section
             menuItems.forEach(item => {
                 item.addEventListener('click', function() {
                     if (this.classList.contains('disabled')) {
                         return;
                     }
 
+                    // 移除所有活动状态
+                    menuItems.forEach(mi => mi.classList.remove('active'));
+                    sections.forEach(section => section.classList.remove('active'));
+
+                    // 添加活动状态
+                    this.classList.add('active');
                     const targetSection = this.getAttribute('data-section') + '-section';
-                    scrollToSection(targetSection);
-                    updateActiveMenuItem(this.getAttribute('data-section'));
-                });
-            });
-
-            // 滚动时自动高亮对应菜单项
-            const observerOptions = {
-                root: null,
-                rootMargin: '-20% 0px -70% 0px',
-                threshold: 0
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        const sectionId = entry.target.id;
-                        const sectionName = sectionId.replace('-section', '');
-                        updateActiveMenuItem(sectionName);
+                    const section = document.getElementById(targetSection);
+                    if (section) {
+                        section.classList.add('active');
                     }
                 });
-            }, observerOptions);
-
-            // 观察所有section
-            sections.forEach(section => {
-                observer.observe(section);
             });
-
-            // 初始化时设置第一个section为活动状态
-            if (sections.length > 0) {
-                updateActiveMenuItem('overview');
-            }
         });
     </script>
 </body>

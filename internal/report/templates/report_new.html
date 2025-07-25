@@ -333,7 +333,7 @@
                     <h2>🤖 AI 分析</h2>
                     <p>基于人工智能的代码模式和开发习惯分析</p>
                 </div>
-                {{if .AIAnalysis}}
+                {{if .AIStatus.Available}}
                 <div class="ai-analysis-cards">
                     <div class="ai-card analysis">
                         <div class="card-header" onclick="toggleAIAnalysis()">
@@ -353,7 +353,64 @@
                 <script type="text/plain" id="aiAnalysisData">{{.AIAnalysis}}</script>
                 {{else}}
                 <div class="empty-section">
-                    <p>AI分析功能暂时不可用，请检查配置</p>
+                    {{if eq .AIStatus.ErrorType "disabled"}}
+                    <div class="ai-disabled">
+                        <div class="icon">🤖</div>
+                        <h3>AI分析未开启</h3>
+                        <p>AI分析功能可以为您提供智能化的代码分析和建议</p>
+                        <div class="enable-instructions">
+                            <h4>开启方式：</h4>
+                            <div class="code-block">
+                                <code>./git-log-analyzer --ai</code>
+                            </div>
+                            <p>或者设置环境变量后直接运行：</p>
+                            <div class="code-block">
+                                <code>export AI_API_KEY="your-api-key"<br>./git-log-analyzer --ai</code>
+                            </div>
+                        </div>
+                    </div>
+                    {{else if eq .AIStatus.ErrorType "config_error"}}
+                    <div class="ai-error">
+                        <div class="icon">⚠️</div>
+                        <h3>AI分析配置错误</h3>
+                        <p>{{.AIStatus.ErrorMessage}}</p>
+                        <div class="config-instructions">
+                            <h4>配置方法：</h4>
+                            <ol>
+                                <li>设置AI API密钥环境变量：
+                                    <div class="code-block">
+                                        <code>export AI_API_KEY="your-openai-api-key"</code>
+                                    </div>
+                                </li>
+                                <li>（可选）设置其他AI配置：
+                                    <div class="code-block">
+                                        <code>export AI_MODEL="gpt-3.5-turbo"<br>export AI_MAX_TOKENS="2000"</code>
+                                    </div>
+                                </li>
+                                <li>重新运行分析：
+                                    <div class="code-block">
+                                        <code>./git-log-analyzer --ai</code>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    {{else}}
+                    <div class="ai-error">
+                        <div class="icon">❌</div>
+                        <h3>AI分析失败</h3>
+                        <p>{{.AIStatus.ErrorMessage}}</p>
+                        <div class="troubleshoot-instructions">
+                            <h4>故障排除：</h4>
+                            <ul>
+                                <li>检查网络连接是否正常</li>
+                                <li>验证API密钥是否有效</li>
+                                <li>确认API配额是否充足</li>
+                                <li>检查防火墙设置</li>
+                            </ul>
+                        </div>
+                    </div>
+                    {{end}}
                 </div>
                 {{end}}
             </section>

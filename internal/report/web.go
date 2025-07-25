@@ -52,10 +52,19 @@ type ReportData struct {
 	FileData            []FileData
 	CommitTimeline      []TimelineData
 	AIAnalysis          string
+	AIStatus            AIStatus
 	CodeHealthMetrics   *health.CodeHealthMetrics
 	DeveloperProfiles   []*developer.DeveloperProfile
 	Messages            *i18n.Messages
 	Language            i18n.Language
+}
+
+// AIStatus represents the status of AI analysis
+type AIStatus struct {
+	Enabled       bool
+	Available     bool
+	ErrorType     string // "disabled", "config_error", "analysis_error"
+	ErrorMessage  string
 }
 
 // AuthorData represents author statistics for web display
@@ -92,14 +101,14 @@ type TimelineData struct {
 }
 
 // GenerateReport generates a complete HTML report
-func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalysis string, projectName string, developerProfiles []*developer.DeveloperProfile) error {
+func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalysis string, aiStatus AIStatus, projectName string, developerProfiles []*developer.DeveloperProfile) error {
 	// Create output directory
 	if err := os.MkdirAll(w.outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create output directory: %v", err)
 	}
 
 	// Prepare report data
-	reportData := w.prepareReportData(stats, aiAnalysis, projectName, developerProfiles)
+	reportData := w.prepareReportData(stats, aiAnalysis, aiStatus, projectName, developerProfiles)
 
 	// Generate HTML report
 	if err := w.generateHTMLReport(reportData); err != nil {
@@ -125,7 +134,7 @@ func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalys
 }
 
 // prepareReportData prepares data for web report
-func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, projectName string, developerProfiles []*developer.DeveloperProfile) *ReportData {
+func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, aiStatus AIStatus, projectName string, developerProfiles []*developer.DeveloperProfile) *ReportData {
 	lang := i18n.GetLanguage()
 	msg := i18n.GetMessages(lang)
 	
@@ -134,6 +143,7 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 		ProjectName:       projectName,
 		Stats:             stats,
 		AIAnalysis:        aiAnalysis,
+		AIStatus:          aiStatus,
 		CodeHealthMetrics: stats.CodeHealthMetrics,
 		DeveloperProfiles: developerProfiles,
 		Messages:          msg,

@@ -1760,3 +1760,150 @@ html {
         grid-template-columns: 1fr;
     }
 }
+
+/* AI 状态样式 */
+.ai-disabled, .ai-error {
+    text-align: center;
+    padding: 48px 32px;
+    background: linear-gradient(135deg, rgba(127, 127, 213, 0.03) 0%, rgba(145, 234, 228, 0.03) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(127, 127, 213, 0.1);
+}
+
+.ai-disabled .icon, .ai-error .icon {
+    font-size: 4em;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.ai-disabled h3, .ai-error h3 {
+    color: #2d3748;
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.ai-disabled p, .ai-error p {
+    color: #718096;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.enable-instructions, .config-instructions, .troubleshoot-instructions {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 2px 8px rgba(127, 127, 213, 0.08);
+    text-align: left;
+}
+
+.enable-instructions h4, .config-instructions h4, .troubleshoot-instructions h4 {
+    color: #2d3748;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.enable-instructions h4::before {
+    content: '🚀';
+    margin-right: 8px;
+}
+
+.config-instructions h4::before {
+    content: '⚙️';
+    margin-right: 8px;
+}
+
+.troubleshoot-instructions h4::before {
+    content: '🔧';
+    margin-right: 8px;
+}
+
+.code-block {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9em;
+}
+
+.code-block code {
+    color: #2d3748;
+    background: none;
+    padding: 0;
+    font-size: inherit;
+}
+
+.config-instructions ol {
+    list-style: none;
+    counter-reset: step-counter;
+    padding-left: 0;
+}
+
+.config-instructions ol li {
+    counter-increment: step-counter;
+    margin-bottom: 16px;
+    padding-left: 32px;
+    position: relative;
+}
+
+.config-instructions ol li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(135deg, #7F7FD5 0%, #86A8E7 100%);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.troubleshoot-instructions ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.troubleshoot-instructions ul li {
+    padding: 8px 0;
+    padding-left: 24px;
+    position: relative;
+}
+
+.troubleshoot-instructions ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #7F7FD5;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    .ai-disabled, .ai-error {
+        padding: 32px 24px;
+    }
+    
+    .enable-instructions, .config-instructions, .troubleshoot-instructions {
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .code-block {
+        padding: 10px 12px;
+        font-size: 0.85em;
+        overflow-x: auto;
+    }
+}

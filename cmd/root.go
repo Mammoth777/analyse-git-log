@@ -195,6 +195,8 @@ func analyzeGitLog(repoPath string) error {
 
 	var finalReport string
 	var aiAnalysis string
+	var aiError error
+	var aiConfigError bool
 	
 	// Step 4: AI Analysis (if enabled)
 	if useAI {
@@ -203,12 +205,16 @@ func analyzeGitLog(repoPath string) error {
 		
 		aiClient, err := ai.NewAIClient()
 		if err != nil {
+			aiError = err
+			aiConfigError = true
 			tracker.CompleteStepWithWarning("AI分析跳过", fmt.Sprintf("AI客户端初始化失败: %v", err))
 			finalReport = basicReport + developerReport.String()
 		} else {
 			tracker.UpdateStepProgress("发送分析请求到AI服务...")
 			aiResult, err := aiClient.AnalyzeWithAI(stats, basicReport)
 			if err != nil {
+				aiError = err
+				aiConfigError = false
 				tracker.CompleteStepWithWarning("AI分析跳过", fmt.Sprintf("AI分析失败: %v", err))
 				finalReport = basicReport + developerReport.String()
 			} else {
@@ -236,11 +242,45 @@ func analyzeGitLog(repoPath string) error {
 			projectName = "Current Repository"
 		}
 		
+		// Prepare AI status
+		var aiStatus report.AIStatus
+		if !useAI {
+			aiStatus = report.AIStatus{
+				Enabled:      false,
+				Available:    false,
+				ErrorType:    "disabled",
+				ErrorMessage: "",
+			}
+		} else if aiError != nil {
+			if aiConfigError {
+				aiStatus = report.AIStatus{
+					Enabled:      true,
+					Available:    false,
+					ErrorType:    "config_error",
+					ErrorMessage: aiError.Error(),
+				}
+			} else {
+				aiStatus = report.AIStatus{
+					Enabled:      true,
+					Available:    false,
+					ErrorType:    "analysis_error",
+					ErrorMessage: aiError.Error(),
+				}
+			}
+		} else {
+			aiStatus = report.AIStatus{
+				Enabled:      true,
+				Available:    true,
+				ErrorType:    "",
+				ErrorMessage: "",
+			}
+		}
+		
 		subTracker := tracker.CreateSubTracker("Web报告生成", 3)
 		subTracker.UpdateSub("准备报告数据")
 		subTracker.UpdateSub("渲染HTML模板")
 		
-		err := webGen.GenerateReport(stats, aiAnalysis, projectName, developerProfiles)
+		err := webGen.GenerateReport(stats, aiAnalysis, aiStatus, projectName, developerProfiles)
 		if err != nil {
 			tracker.UpdateStepProgress(fmt.Sprintf("Web报告生成失败: %v", err))
 		} else {

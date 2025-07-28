@@ -91,13 +91,15 @@ type ProgressCallback func(current, total int, message string)
 
 // Analyzer analyzes git commits
 type Analyzer struct {
-	repo *git.Repository
+	repo         *git.Repository
+	analysisMonths int
 }
 
 // NewAnalyzer creates a new analyzer instance
-func NewAnalyzer(repoPath string) *Analyzer {
+func NewAnalyzer(repoPath string, analysisMonths int) *Analyzer {
 	return &Analyzer{
-		repo: git.NewRepository(repoPath),
+		repo:           git.NewRepository(repoPath),
+		analysisMonths: analysisMonths,
 	}
 }
 
@@ -112,7 +114,7 @@ func (a *Analyzer) AnalyzeWithProgress(progressCallback ProgressCallback) (*Stat
 		progressCallback(0, 100, "开始获取提交历史...")
 	}
 	
-	commits, err := a.repo.GetCommitsWithProgress(0, func(current, total int, message string) {
+	commits, err := a.repo.GetCommitsWithTimeRangeAndProgress(0, a.analysisMonths, func(current, total int, message string) {
 		if progressCallback != nil {
 			// Map commit parsing to 0-20% of overall progress
 			progress := int(float64(current) / float64(total) * 20)

@@ -25,6 +25,7 @@ var generateWeb bool
 var outputDir string
 var openBrowser bool
 var reportLanguage string
+var analysisMonths int
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -72,6 +73,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&outputDir, "output-dir", getEnv("REPORT_OUTPUT_DIR", "./analysis-reports"), "output directory for reports")
 	rootCmd.PersistentFlags().BoolVar(&openBrowser, "open", getEnvBool("AUTO_OPEN_BROWSER", false), "automatically open web report in browser")
 	rootCmd.PersistentFlags().StringVarP(&reportLanguage, "lang", "l", getEnv("REPORT_LANGUAGE", "zh"), "report language (zh/en)")
+	rootCmd.PersistentFlags().IntVarP(&analysisMonths, "months", "m", 6, "analyze commits from the last N months (default: 6)")
 
 	// Bind flags to viper
 	viper.BindPFlag("repo", rootCmd.PersistentFlags().Lookup("repo"))
@@ -80,6 +82,7 @@ func init() {
 	viper.BindPFlag("web", rootCmd.PersistentFlags().Lookup("web"))
 	viper.BindPFlag("output-dir", rootCmd.PersistentFlags().Lookup("output-dir"))
 	viper.BindPFlag("open", rootCmd.PersistentFlags().Lookup("open"))
+	viper.BindPFlag("months", rootCmd.PersistentFlags().Lookup("months"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -132,7 +135,7 @@ func analyzeGitLog(repoPath string) error {
 	time.Sleep(400 * time.Millisecond) // 模拟耗时操作
 	tracker.UpdateStepProgress("创建分析器实例")
 	
-	a := analyzer.NewAnalyzer(repoPath)
+	a := analyzer.NewAnalyzer(repoPath, analysisMonths)
 	tracker.CompleteStep("环境初始化完成")
 	
 	time.Sleep(300 * time.Millisecond) // 让用户看到完成状态

@@ -67,6 +67,11 @@ func (r *Repository) GetCommits(limit int) ([]GitCommit, error) {
 
 // GetCommitsWithProgress retrieves git commits from the repository with progress callback
 func (r *Repository) GetCommitsWithProgress(limit int, progressCallback ProgressCallback) ([]GitCommit, error) {
+	return r.GetCommitsWithTimeRangeAndProgress(limit, 0, progressCallback)
+}
+
+// GetCommitsWithTimeRangeAndProgress retrieves git commits from the repository with time range and progress callback
+func (r *Repository) GetCommitsWithTimeRangeAndProgress(limit int, months int, progressCallback ProgressCallback) ([]GitCommit, error) {
 	if !IsGitInstalled() {
 		return nil, fmt.Errorf("git is not installed or not available in PATH")
 	}
@@ -78,6 +83,13 @@ func (r *Repository) GetCommitsWithProgress(limit int, progressCallback Progress
 	// Git log format: hash|author|email|date|subject|body|parents
 	format := "--pretty=format:%H|%an|%ae|%ai|%s|%b|%P"
 	args := []string{"log", format}
+	
+	// Add time range if specified
+	if months > 0 {
+		since := time.Now().AddDate(0, -months, 0).Format("2006-01-02")
+		args = append(args, fmt.Sprintf("--since=%s", since))
+	}
+	
 	if limit > 0 {
 		args = append(args, fmt.Sprintf("-%d", limit))
 	}

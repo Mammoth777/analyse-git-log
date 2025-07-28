@@ -14,6 +14,47 @@
 
 ## 安装和使用
 
+### 📥 下载预编译版本（推荐）
+
+从 [Releases 页面](https://github.com/Mammoth777/analyse-git-log/releases) 下载适合您系统的预编译版本：
+
+- **macOS**: `git-log-analyzer-darwin-amd64.tar.gz` (Intel) 或 `git-log-analyzer-darwin-arm64.tar.gz` (Apple Silicon)
+- **Linux**: `git-log-analyzer-linux-amd64.tar.gz` 或 `git-log-analyzer-linux-arm64.tar.gz`
+- **Windows**: `git-log-analyzer-windows-amd64.zip`
+
+#### macOS 安装
+```bash
+# 下载并解压
+tar -xzf git-log-analyzer-darwin-*.tar.gz
+
+# 赋予执行权限
+chmod +x git-log-analyzer-darwin-*
+
+# 运行
+./git-log-analyzer-darwin-* --help
+```
+
+> **注意**: macOS版本已通过Apple公证，首次运行时系统会自动验证。
+
+#### Linux 安装
+```bash
+# 下载并解压
+tar -xzf git-log-analyzer-linux-*.tar.gz
+
+# 赋予执行权限
+chmod +x git-log-analyzer-linux-*
+
+# 运行
+./git-log-analyzer-linux-* --help
+```
+
+#### Windows 安装
+1. 下载 `git-log-analyzer-windows-amd64.zip`
+2. 解压到任意目录
+3. 在命令提示符或PowerShell中运行 `git-log-analyzer-windows-amd64.exe`
+
+### 🔨 从源码构建
+
 ### 前置要求
 
 - Go 1.21+
@@ -27,9 +68,29 @@ go mod tidy
 
 ### 构建
 
+#### 本地构建
 ```bash
+# 简单构建
 go build -o git-log-analyzer
+
+# 多平台构建（推荐）
+./scripts/build.sh [version]
 ```
+
+#### GitHub Actions自动构建
+项目配置了GitHub Actions工作流，支持：
+- 多平台构建 (Linux, macOS, Windows)
+- Apple代码签名和公证
+- 自动发布到GitHub Releases
+
+触发构建：
+```bash
+# 创建并推送标签
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+详细配置请参考 [GITHUB_SECRETS.md](GITHUB_SECRETS.md)
 
 ### 使用方法
 

@@ -57,6 +57,7 @@ type ReportData struct {
 	DeveloperProfiles   []*developer.DeveloperProfile
 	Messages            *i18n.Messages
 	Language            i18n.Language
+	AnalysisMonths      int
 }
 
 // AIStatus represents the status of AI analysis
@@ -101,14 +102,14 @@ type TimelineData struct {
 }
 
 // GenerateReport generates a complete HTML report
-func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalysis string, aiStatus AIStatus, projectName string, developerProfiles []*developer.DeveloperProfile) error {
+func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalysis string, aiStatus AIStatus, projectName string, developerProfiles []*developer.DeveloperProfile, analysisMonths int) error {
 	// Create output directory
 	if err := os.MkdirAll(w.outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create output directory: %v", err)
 	}
 
 	// Prepare report data
-	reportData := w.prepareReportData(stats, aiAnalysis, aiStatus, projectName, developerProfiles)
+	reportData := w.prepareReportData(stats, aiAnalysis, aiStatus, projectName, developerProfiles, analysisMonths)
 
 	// Generate HTML report
 	if err := w.generateHTMLReport(reportData); err != nil {
@@ -134,7 +135,7 @@ func (w *WebReportGenerator) GenerateReport(stats *analyzer.Statistics, aiAnalys
 }
 
 // prepareReportData prepares data for web report
-func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, aiStatus AIStatus, projectName string, developerProfiles []*developer.DeveloperProfile) *ReportData {
+func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAnalysis string, aiStatus AIStatus, projectName string, developerProfiles []*developer.DeveloperProfile, analysisMonths int) *ReportData {
 	lang := i18n.GetLanguage()
 	msg := i18n.GetMessages(lang)
 	
@@ -148,6 +149,7 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 		DeveloperProfiles: developerProfiles,
 		Messages:          msg,
 		Language:          lang,
+		AnalysisMonths:    analysisMonths,
 	}
 
 	// Prepare top authors
@@ -287,6 +289,9 @@ func (w *WebReportGenerator) generateHTMLReport(data *ReportData) error {
 		},
 		"mul": func(a, b float64) float64 {
 			return a * b
+		},
+		"add": func(a, b int) int {
+			return a + b
 		},
 		"printf": func(format string, v ...interface{}) string {
 			return fmt.Sprintf(format, v...)

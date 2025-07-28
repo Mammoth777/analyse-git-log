@@ -415,6 +415,22 @@ html {
     border-radius: 12px;
     padding: 16px;
     border: 1px solid rgba(59, 130, 246, 0.1);
+    overflow: visible; /* 确保内容不被裁剪 */
+}
+
+/* 包含分支表格的chart-container需要自适应高度 */
+.chart-container.branch-table-chart {
+    height: auto;
+    min-height: 350px;
+    max-height: none; /* 移除最大高度限制 */
+}
+
+/* 为生命周期分析容器增加高度 */
+.chart-container.lifecycle-container {
+    height: auto;
+    min-height: 450px;
+    padding-bottom: 40px; /* 增加底部内边距 */
+    overflow: visible; /* 确保内容完全可见 */
 }
 
 .chart-container:hover {
@@ -463,6 +479,11 @@ html {
     
     .chart-container {
         height: 300px;
+    }
+    
+    .chart-container.branch-table-chart {
+        height: auto;
+        min-height: 300px;
     }
     
     .chart-container.full-width {
@@ -1906,4 +1927,722 @@ html {
         font-size: 0.85em;
         overflow-x: auto;
     }
+}
+
+/* =========================== */
+/* 分支分析样式 */
+/* =========================== */
+
+/* 分支摘要卡片 */
+.branch-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card.active {
+    border-color: #4CAF50;
+    background: linear-gradient(135deg, #E8F5E8 0%, #F1F8F1 100%);
+}
+
+.summary-card.stale {
+    border-color: #FF9800;
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFF8F0 100%);
+}
+
+.summary-card.merged {
+    border-color: #2196F3;
+    background: linear-gradient(135deg, #E3F2FD 0%, #F0F7FF 100%);
+}
+
+.summary-card.highlight {
+    border-color: #9C27B0;
+    background: linear-gradient(135deg, #F3E5F5 0%, #F8F0F8 100%);
+}
+
+.summary-title {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.summary-value {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* 分支表格 */
+.branch-table-container {
+    overflow-x: auto;
+    overflow-y: visible; /* 允许垂直溢出，用于显示tooltip */
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-height: 60vh;
+}
+
+.branch-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.branch-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.branch-table th {
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+}
+
+.branch-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.branch-row:hover {
+    background-color: #f8f9ff;
+}
+
+.branch-row:last-child td {
+    border-bottom: none;
+}
+
+/* 分支名称 */
+.branch-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.branch-icon {
+    font-size: 1.2em;
+}
+
+.branch-icon[data-type="main"] {
+    color: #4CAF50;
+}
+
+.branch-icon[data-type="feature"] {
+    color: #2196F3;
+}
+
+.branch-icon[data-type="hotfix"] {
+    color: #FF5722;
+}
+
+.branch-icon[data-type="release"] {
+    color: #FF9800;
+}
+
+/* 分支类型标签 */
+.branch-type {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.branch-type.main {
+    background-color: #E8F5E8;
+    color: #2E7D32;
+}
+
+.branch-type.feature {
+    background-color: #E3F2FD;
+    color: #1565C0;
+}
+
+.branch-type.hotfix {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+.branch-type.release {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+.branch-type.development {
+    background-color: #F3E5F5;
+    color: #7B1FA2;
+}
+
+/* 分支状态标签 */
+.branch-status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.branch-status.active {
+    background-color: #E8F5E8;
+    color: #2E7D32;
+}
+
+.branch-status.inactive {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+.branch-status.merged {
+    background-color: #E3F2FD;
+    color: #1565C0;
+}
+
+.branch-status.stale {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+/* 活跃度标签 */
+.activity-level {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.activity-level.high {
+    background-color: #E8F5E8;
+    color: #2E7D32;
+}
+
+.activity-level.medium {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+.activity-level.low {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+/* 提交数和生命周期 */
+.commit-count, .lifespan {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: #555;
+}
+
+/* 作者信息 */
+.authors {
+    font-size: 0.9em;
+}
+
+.author {
+    color: #666;
+}
+
+/* 分支表格样式 */
+.branch-table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 60vh; /* 使用视口高度，可以显示更多内容 */
+    margin-top: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    position: relative;
+}
+
+.branch-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    line-height: 1.5;
+    min-width: 700px; /* 减少最小宽度，因为移除了提交数列 */
+}
+
+.branch-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.branch-table thead th {
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    border: none;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.branch-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.branch-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.branch-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.branch-table tbody td {
+    padding: 12px; /* 恢复合适的内边距 */
+    border: none;
+    height: 56px; /* 设置固定行高 */
+    vertical-align: middle; /* 使用表格原生的垂直居中 */
+    position: relative; /* 为tooltip定位 */
+}
+
+.branch-table .branch-name {
+    font-weight: 600;
+    max-width: 250px; /* 限制最大宽度 */
+    white-space: nowrap; /* 确保不换行 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 超长显示省略号 */
+    cursor: pointer; /* 鼠标指针样式 */
+    display: inline-block; /* 使用inline-block而不是flex */
+    vertical-align: middle; /* 垂直居中对齐 */
+}
+
+/* Hover 时显示完整内容的 tooltip */
+.branch-table .branch-name:hover::after {
+    content: attr(title);
+    position: absolute;
+    top: -40px; /* 调整位置避免被遮挡 */
+    left: 50%;
+    transform: translateX(-50%); /* 水平居中 */
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 10000; /* 确保在最顶层 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    animation: tooltipFadeIn 0.2s ease forwards;
+    pointer-events: none; /* 防止tooltip干扰鼠标事件 */
+    max-width: 300px; /* 限制最大宽度 */
+}
+
+/* Tooltip 动画 */
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.branch-table .branch-index {
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    width: 60px;
+    min-width: 60px;
+}
+
+.branch-table .branch-icon {
+    margin-right: 8px;
+    font-size: 16px;
+    vertical-align: middle; /* 垂直居中对齐 */
+}
+
+.branch-table .lifespan {
+    color: #666;
+    font-weight: 500;
+    white-space: nowrap; /* 防止天数换行 */
+}
+
+.branch-table .last-commit {
+    color: #666;
+    font-size: 0.9em;
+    /* 允许时间信息在需要时换行，但保持居中 */
+    line-height: 1.4;
+}
+
+.branch-table .authors {
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.4;
+    /* 允许作者信息换行，但保持居中对齐 */
+}
+
+.branch-table .authors .author {
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.branch-table .author {
+    color: #666;
+}
+
+/* 表格滚动条样式 */
+.branch-table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.branch-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.branch-table-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+}
+
+.branch-table-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.branch-table-container::-webkit-scrollbar-corner {
+    background: #f1f1f1;
+}
+
+/* 生命周期占位符样式 */
+.lifecycle-placeholder {
+    padding: 60px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    border: 2px dashed #cbd5e0;
+}
+
+.placeholder-content {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.placeholder-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.7;
+}
+
+.placeholder-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4a5568;
+    margin: 0 0 8px 0;
+}
+
+.placeholder-note {
+    font-size: 14px;
+    color: #718096;
+    font-style: italic;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .branch-table-container {
+        margin: 16px -20px;
+        border-radius: 0;
+        max-height: 50vh; /* 中等屏幕对应调整高度 */
+    }
+    
+    .branch-table {
+        min-width: 600px; /* 减少最小宽度 */
+    }
+    
+    .branch-table .authors {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 768px) {
+    .branch-table-container {
+        max-height: 40vh; /* 小屏幕对应调整高度 */
+    }
+    
+    .branch-table {
+        font-size: 13px;
+        min-width: 500px; /* 进一步减少最小宽度 */
+    }
+    
+    .branch-table thead th,
+    .branch-table tbody td {
+        padding: 12px 8px;
+        height: 48px; /* 移动端稍微减少行高 */
+    }
+    
+    .branch-table .branch-name {
+        max-width: 120px; /* 移动端减少分支名宽度 */
+    }
+    
+    .branch-table .authors {
+        max-width: 100px;
+    }
+}
+
+
+/* 合并模式优化 */
+.merge-patterns {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 增加间距 */
+    margin-bottom: 30px; /* 增加底部间距 */
+    position: relative;
+    z-index: 1;
+}
+
+.merge-pattern {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px; /* 增加内边距 */
+    background: white;
+    border-radius: 10px; /* 更圆润 */
+    border: 1px solid #e1e1e1;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 添加轻微阴影 */
+}
+
+.merge-pattern:hover {
+    border-color: #d1d1d1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    z-index: 3;
+}
+
+.merge-info {
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+}
+
+.merge-date {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.conflict-risk {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.conflict-risk.low {
+    background-color: #E8F5E8;
+    color: #2E7D32;
+}
+
+.conflict-risk.medium {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+.conflict-risk.high {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .branch-summary {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .summary-card {
+        padding: 15px;
+    }
+    
+    .summary-value {
+        font-size: 1.5em;
+    }
+    
+    .branch-table {
+        font-size: 0.9em;
+    }
+    
+    .branch-table th,
+    .branch-table td {
+        padding: 8px 6px;
+    }
+    
+    .branch-chips {
+        justify-content: center;
+    }
+    
+    .merge-pattern {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .recent-branch-item {
+        padding: 15px;
+    }
+    
+    .recent-branches-container {
+        max-height: 400px;
+        padding: 8px;
+    }
+    
+    .branch-info {
+        margin-bottom: 8px;
+    }
+    
+    .branch-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .branch-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .branch-table-container {
+        margin: 0 -10px;
+    }
+    
+    .lifecycle-section h4 {
+        font-size: 1em;
+    }
+    
+    .branch-chip {
+        font-size: 0.8em;
+        padding: 6px 10px;
+    }
+    
+    .recent-branches-list {
+        gap: 12px;
+    }
+    
+    .recent-branches-container {
+        max-height: 300px;
+    }
+}
+
+/* 最近活跃分支列表样式 */
+.recent-branches-container {
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    background: #fafafa;
+    padding: 10px;
+}
+
+.recent-branches-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.recent-branches-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.recent-branches-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.recent-branches-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.recent-branches-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.recent-branch-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.recent-branch-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border-color: #e0e0e0;
+}
+
+.branch-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.branch-info .branch-name {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.branch-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.commit-count {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: #4CAF50;
+}
+
+.last-commit {
+    color: #777;
+}
+
+.branch-authors {
+    font-size: 0.85em;
+    color: #888;
+    font-style: italic;
 }

@@ -288,7 +288,7 @@ func analyzeGitLog(repoPath string) error {
 		subTracker.UpdateSub("准备报告数据")
 		subTracker.UpdateSub("渲染HTML模板")
 		
-		err := webGen.GenerateReport(stats, aiAnalysis, aiStatus, projectName, developerProfiles)
+		err := webGen.GenerateReport(stats, aiAnalysis, aiStatus, projectName, developerProfiles, analysisMonths)
 		if err != nil {
 			tracker.UpdateStepProgress(fmt.Sprintf("Web报告生成失败: %v", err))
 		} else {

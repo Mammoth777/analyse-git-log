@@ -263,28 +263,79 @@
             <!-- 分支结构 -->
             <section id="branch-section" class="content-section">
                 <div class="section-header">
-                    <h2>🌲 分支结构</h2>
-                    <p>Git分支和提交的可视化分析</p>
+                    <h2>🌲 分支概览</h2>
+                    <p>Git分支状态和生命周期分析</p>
                 </div>
                 <div class="section-content">
                     {{if .Stats.BranchData}}
-                    <div class="chart-container full-width commit-forest-container">
-                        <h3>🌲 {{.Messages.CommitForest}}</h3>
-                        <div class="forest-controls">
-                            <button id="zoomIn" class="forest-btn">🔍+</button>
-                            <button id="zoomOut" class="forest-btn">🔍-</button>
-                            <button id="resetView" class="forest-btn">⟲</button>
-                            <select id="branchFilter" class="forest-select">
-                                <option value="all">所有分支</option>
-                                {{range .Stats.BranchData.Branches}}
-                                <option value="{{.Name}}">{{.Name}} ({{.CommitCount}})</option>
-                                {{end}}
-                            </select>
+                    <!-- 分支摘要 -->
+                    <div class="chart-container">
+                        <h3>📊 分支概览</h3>
+                        <div class="branch-summary">
+                            <div class="summary-card">
+                                <div class="summary-title">分支总数</div>
+                                <div class="summary-value">{{.Stats.BranchData.Summary.TotalBranches}}</div>
+                            </div>
+                            <div class="summary-card active">
+                                <div class="summary-title">{{.AnalysisMonths}}月内活跃分支</div>
+                                <div class="summary-value">{{.Stats.BranchData.Summary.ActiveBranchesInRange}}</div>
+                            </div>
+                            <div class="summary-card highlight">
+                                <div class="summary-title">最近半个月活跃分支</div>
+                                <div class="summary-value">{{len .Stats.BranchData.Summary.RecentActiveBranches}}</div>
+                            </div>
                         </div>
-                        <svg id="commitForest" class="commit-forest-svg" width="100%" height="500"></svg>
-                        <div class="forest-info">
-                            <div class="info-panel" id="commitInfo" style="display: none;">
-                                <div id="commitDetails"></div>
+                    </div>
+
+                    <!-- 最近活跃分支列表与详情 -->
+                    {{if .Stats.BranchData.Summary.RecentActiveBranches}}
+                    <div class="chart-container branch-table-chart">
+                        <h3>📋 最近半个月活跃分支详情</h3>
+                        <div class="branch-table-container">
+                            <table class="branch-table">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>分支名称</th>
+                                        <th>生命周期</th>
+                                        <th>最后更新</th>
+                                        <th>主要贡献者</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{range $index, $branch := .Stats.BranchData.Summary.RecentActiveBranches}}
+                                    <tr class="branch-row" data-status="{{$branch.Status}}">
+                                        <td class="branch-index">{{add $index 1}}</td>
+                                        <td class="branch-name" title="{{$branch.Name}}">
+                                            <span class="branch-icon" data-type="{{$branch.Type}}">{{if eq $branch.Type "main"}}🏠{{else if eq $branch.Type "feature"}}🌟{{else if eq $branch.Type "hotfix"}}🔥{{else if eq $branch.Type "release"}}🚀{{else}}📦{{end}}</span>
+                                            {{$branch.Name}}
+                                        </td>
+                                        <td class="lifespan">{{$branch.LifespanDays}}天</td>
+                                        <td class="last-commit">{{$branch.LastCommit.Format "2006-01-02 15:04"}}{{ if $branch.LastCommitHash }} ({{printf "%.7s" $branch.LastCommitHash}}){{ end }}</td>
+                                        <td class="authors">
+                                            {{range $i, $author := $branch.MainAuthors}}
+                                                {{if $i}}, {{end}}
+                                                <span class="author">{{$author.Name}} ({{printf "%.0f" $author.Percentage}}%)</span>
+                                            {{end}}
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {{end}}
+
+
+
+                    <!-- 生命周期分析 -->
+                    <div class="chart-container lifecycle-container">
+                        <h3>🔄 生命周期分析</h3>
+                        <div class="lifecycle-placeholder">
+                            <div class="placeholder-content">
+                                <span class="placeholder-icon">🚧</span>
+                                <p class="placeholder-text">功能开发中</p>
+                                <small class="placeholder-note">生命周期分析模块正在重构，敬请期待</small>
                             </div>
                         </div>
                     </div>

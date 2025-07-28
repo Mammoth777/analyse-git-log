@@ -141,7 +141,12 @@ func analyzeGitLog(repoPath string) error {
 	tracker.StartStep("Git日志分析")
 	tracker.UpdateStepProgress("获取提交历史...")
 	
-	stats, err := a.Analyze()
+	stats, err := a.AnalyzeWithProgress(func(current, total int, message string) {
+		// 将analyzer的进度映射到这个步骤的进度更新
+		if current%10 == 0 || current == total { // 每10%或完成时更新
+			tracker.UpdateStepProgress(fmt.Sprintf("%s (%d%%)", message, current))
+		}
+	})
 	if err != nil {
 		tracker.FailStep(fmt.Sprintf("分析失败: %v", err))
 		return fmt.Errorf("failed to analyze repository: %v", err)
@@ -166,8 +171,8 @@ func analyzeGitLog(repoPath string) error {
 	// Analyze top contributors (limit to top 10 for performance)
 	var developerProfiles []*developer.DeveloperProfile
 	contributorCount := len(stats.AuthorStats)
-	if contributorCount > 10 {
-		contributorCount = 10
+	if contributorCount > 100 {
+		contributorCount = 100
 	}
 	
 	idx := 0

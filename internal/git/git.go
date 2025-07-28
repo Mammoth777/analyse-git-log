@@ -2,6 +2,7 @@ package git
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -56,8 +57,16 @@ func IsGitInstalled() bool {
 	return err == nil
 }
 
+// ProgressCallback is a function type for progress reporting
+type ProgressCallback func(current, total int, message string)
+
 // GetCommits retrieves git commits from the repository
 func (r *Repository) GetCommits(limit int) ([]GitCommit, error) {
+	return r.GetCommitsWithProgress(limit, nil)
+}
+
+// GetCommitsWithProgress retrieves git commits from the repository with progress callback
+func (r *Repository) GetCommitsWithProgress(limit int, progressCallback ProgressCallback) ([]GitCommit, error) {
 	if !IsGitInstalled() {
 		return nil, fmt.Errorf("git is not installed or not available in PATH")
 	}
@@ -80,16 +89,32 @@ func (r *Repository) GetCommits(limit int) ([]GitCommit, error) {
 		return nil, fmt.Errorf("failed to get git log: %v", err)
 	}
 
-	return parseCommits(string(output))
+	return parseCommitsWithProgress(string(output), progressCallback)
 }
 
 // parseCommits parses git log output into GitCommit structs
 func parseCommits(output string) ([]GitCommit, error) {
+	return parseCommitsWithProgress(output, nil)
+}
+
+// parseCommitsWithProgress parses git log output into GitCommit structs with progress reporting
+func parseCommitsWithProgress(output string, progressCallback ProgressCallback) ([]GitCommit, error) {
 	var commits []GitCommit
 	lines := strings.Split(output, "\n")
 	
-	for i := 0; i < len(lines); i++ {
-		line := strings.TrimSpace(lines[i])
+	// Filter out empty lines first to get accurate count
+	var validLines []string
+	for _, line := range lines {
+		if strings.TrimSpace(line) != "" {
+			validLines = append(validLines, line)
+		}
+	}
+	
+	totalLines := len(validLines)
+	processed := 0
+	
+	for i, line := range validLines {
+		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
@@ -138,6 +163,12 @@ func parseCommits(output string) ([]GitCommit, error) {
 		}
 
 		commits = append(commits, commit)
+		processed++
+		
+		// Only report progress at the very end
+		if progressCallback != nil && i == totalLines-1 {
+			progressCallback(processed, totalLines, fmt.Sprintf("已解析 %d 个提交", processed))
+		}
 	}
 
 	return commits, nil
@@ -145,6 +176,252 @@ func parseCommits(output string) ([]GitCommit, error) {
 
 // GetCommitStats gets detailed statistics for a commit
 func (r *Repository) GetCommitStats(hash string) (int, int, []string, error) {
+	return r.GetCommitStatsWithProgress(hash, nil, 0, 0)
+}
+
+// GetCommitStatsBatch gets detailed statistics for multiple commits in batches
+func (r *Repository) GetCommitStatsBatch(commits []GitCommit, progressCallback ProgressCallback) error {
+	total := len(commits)
+	
+	// For large repositories (>1000 commits), use optimized batch method
+	if total > 1000 {
+		return r.getCommitStatsBatchOptimized(commits, progressCallback)
+	}
+	
+	// For smaller repositories, use the original method
+	const batchSize = 100
+	
+	for i := 0; i < total; i += batchSize {
+		end := i + batchSize
+		if end > total {
+			end = total
+		}
+		
+		// Process batch
+		batch := commits[i:end]
+		
+		if progressCallback != nil {
+			progressCallback(i, total, fmt.Sprintf("开始处理批次 %d-%d/%d", i+1, end, total))
+		}
+		
+		// Process each commit in the batch
+		for j, commit := range batch {
+			additions, deletions, files, err := r.GetCommitStatsWithProgress(
+				commit.Hash, 
+				progressCallback, 
+				i+j+1, 
+				total,
+			)
+			if err == nil {
+				// Update the commit with statistics
+				commits[i+j].Additions = additions
+				commits[i+j].Deletions = deletions
+				commits[i+j].Files = files
+			}
+		}
+		
+		if progressCallback != nil {
+			progressCallback(end, total, fmt.Sprintf("完成批次 %d-%d/%d", i+1, end, total))
+		}
+	}
+	
+	return nil
+}
+
+// getCommitStatsBatchOptimized uses single git log --stat command for better performance
+func (r *Repository) getCommitStatsBatchOptimized(commits []GitCommit, progressCallback ProgressCallback) error {
+	total := len(commits)
+	const maxBatchSize = 5000 // Process max 5000 commits at once to avoid memory issues
+	
+	if progressCallback != nil {
+		progressCallback(0, total, "开始优化批量处理...")
+	}
+	
+	// Create a map for quick lookup of commits by hash
+	commitMap := make(map[string]*GitCommit)
+	for i := range commits {
+		commitMap[commits[i].Hash] = &commits[i]
+	}
+	
+	// Process commits in chunks to avoid command line length limits and memory issues
+	for start := 0; start < total; start += maxBatchSize {
+		end := start + maxBatchSize
+		if end > total {
+			end = total
+		}
+		
+		// Create hash list for this chunk
+		var hashes []string
+		for i := start; i < end; i++ {
+			hashes = append(hashes, commits[i].Hash)
+		}
+		
+		if progressCallback != nil {
+			progressCallback(start, total, fmt.Sprintf("处理提交块 %d-%d/%d...", start+1, end, total))
+		}
+		
+		err := r.processCommitStatsChunk(hashes, commitMap, progressCallback, start, total)
+		if err != nil {
+			// Fallback to individual processing if batch fails
+			if progressCallback != nil {
+				progressCallback(start, total, fmt.Sprintf("批量处理失败，回退到逐个处理 %d-%d/%d", start+1, end, total))
+			}
+			
+			for i := start; i < end; i++ {
+				additions, deletions, files, err := r.GetCommitStatsWithProgress(
+					commits[i].Hash,
+					progressCallback,
+					i+1,
+					total,
+				)
+				if err == nil {
+					commits[i].Additions = additions
+					commits[i].Deletions = deletions
+					commits[i].Files = files
+				}
+			}
+		}
+		
+		if progressCallback != nil {
+			progressCallback(end, total, fmt.Sprintf("完成提交块 %d-%d/%d", start+1, end, total))
+		}
+	}
+	
+	return nil
+}
+
+// processCommitStatsChunk processes a chunk of commits using single git log --stat command
+func (r *Repository) processCommitStatsChunk(hashes []string, commitMap map[string]*GitCommit, progressCallback ProgressCallback, offset, total int) error {
+	if len(hashes) == 0 {
+		return nil
+	}
+	
+	// Build git log command with --stat for all hashes
+	args := []string{"log", "--stat", "--format=%H", "--no-merges"}
+	
+	// Add individual commit hashes
+	for _, hash := range hashes {
+		args = append(args, hash, "-1") // -1 limits to single commit
+	}
+	
+	// Set timeout for large operations to prevent hanging
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd.Dir = r.Path
+	
+	if progressCallback != nil {
+		progressCallback(offset, total, fmt.Sprintf("执行Git命令获取 %d 个提交的统计信息...", len(hashes)))
+	}
+	
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("failed to get commit stats batch: %v", err)
+	}
+	
+	if progressCallback != nil {
+		progressCallback(offset, total, fmt.Sprintf("解析 %d 个提交的统计信息...", len(hashes)))
+	}
+	
+	return r.parseStatsBatchOutput(string(output), commitMap, progressCallback, offset, total)
+}
+
+// parseStatsBatchOutput parses the output from git log --stat command
+func (r *Repository) parseStatsBatchOutput(output string, commitMap map[string]*GitCommit, progressCallback ProgressCallback, offset, total int) error {
+	lines := strings.Split(output, "\n")
+	var currentHash string
+	var currentFiles []string
+	var currentAdditions, currentDeletions int
+	processed := 0
+	
+	for i, line := range lines {
+		line = strings.TrimSpace(line)
+		
+		// Check if this is a commit hash line
+		if len(line) == 40 && isValidHash(line) {
+			// Save previous commit stats if we have one
+			if currentHash != "" {
+				if commit, exists := commitMap[currentHash]; exists {
+					commit.Files = currentFiles
+					commit.Additions = currentAdditions
+					commit.Deletions = currentDeletions
+					processed++
+				}
+			}
+			
+			// Start new commit
+			currentHash = line
+			currentFiles = []string{}
+			currentAdditions = 0
+			currentDeletions = 0
+			continue
+		}
+		
+		// Skip empty lines
+		if line == "" {
+			continue
+		}
+		
+		// Parse file statistics
+		if strings.Contains(line, "|") && currentHash != "" {
+			parts := strings.Split(line, "|")
+			if len(parts) >= 2 {
+				filename := strings.TrimSpace(parts[0])
+				currentFiles = append(currentFiles, filename)
+			}
+		}
+		
+		// Parse summary line (e.g., "2 files changed, 15 insertions(+), 3 deletions(-)")
+		if (strings.Contains(line, "insertion") || strings.Contains(line, "deletion")) && currentHash != "" {
+			words := strings.Fields(line)
+			for j, word := range words {
+				if strings.Contains(word, "insertion") && j > 0 {
+					fmt.Sscanf(words[j-1], "%d", &currentAdditions)
+				}
+				if strings.Contains(word, "deletion") && j > 0 {
+					fmt.Sscanf(words[j-1], "%d", &currentDeletions)
+				}
+			}
+		}
+		
+		// Report progress every 100 lines for better performance
+		if progressCallback != nil && i%100 == 0 {
+			progressCallback(offset+processed, total, fmt.Sprintf("解析统计信息 %d/%d 行...", i+1, len(lines)))
+		}
+	}
+	
+	// Handle the last commit
+	if currentHash != "" {
+		if commit, exists := commitMap[currentHash]; exists {
+			commit.Files = currentFiles
+			commit.Additions = currentAdditions
+			commit.Deletions = currentDeletions
+			processed++
+		}
+	}
+	
+	if progressCallback != nil {
+		progressCallback(offset+processed, total, fmt.Sprintf("完成解析 %d 个提交的统计信息", processed))
+	}
+	
+	return nil
+}
+
+// isValidHash checks if a string is a valid git hash
+func isValidHash(s string) bool {
+	if len(s) != 40 {
+		return false
+	}
+	for _, r := range s {
+		if !((r >= '0' && r <= '9') || (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F')) {
+			return false
+		}
+	}
+	return true
+}
+
+// GetCommitStatsWithProgress gets detailed statistics for a commit with progress reporting
+func (r *Repository) GetCommitStatsWithProgress(hash string, progressCallback ProgressCallback, current, total int) (int, int, []string, error) {
 	cmd := exec.Command("git", "show", "--stat", "--format=", hash)
 	cmd.Dir = r.Path
 	output, err := cmd.Output()
@@ -185,6 +462,11 @@ func (r *Repository) GetCommitStats(hash string) (int, int, []string, error) {
 				}
 			}
 		}
+	}
+
+	// Report progress if callback is provided
+	if progressCallback != nil && total > 0 {
+		progressCallback(current, total, fmt.Sprintf("获取提交 %s 的统计信息 (%d/%d)", hash[:8], current, total))
 	}
 
 	return additions, deletions, files, nil

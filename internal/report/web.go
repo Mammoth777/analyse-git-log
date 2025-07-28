@@ -166,7 +166,7 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 	})
 
 	for i, author := range authors {
-		if i >= 10 { // Top 10 authors
+		if i >= 100 { // Top 100 authors to match the analysis limit
 			break
 		}
 		percentage := float64(author.stats.CommitCount) / float64(stats.TotalCommits) * 100

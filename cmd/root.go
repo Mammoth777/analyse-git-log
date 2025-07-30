@@ -122,17 +122,17 @@ func analyzeGitLog(repoPath string) error {
 	fmt.Printf("\n🔍 开始分析Git仓库: %s\n", repoPath)
 	
 	// 添加一些延迟让动态进度条效果更明显
-	time.Sleep(500 * time.Millisecond)
+	// time.Sleep(500 * time.Millisecond)
 	
 	// Step 1: Environment validation and initialization
 	tracker.StartStep("环境验证与初始化")
 	
 	// Validate git environment
-	time.Sleep(300 * time.Millisecond) // 模拟耗时操作
+	// time.Sleep(300 * time.Millisecond) // 模拟耗时操作
 	tracker.UpdateStepProgress("Git环境验证通过")
 	
 	// Create analyzer
-	time.Sleep(400 * time.Millisecond) // 模拟耗时操作
+	// time.Sleep(400 * time.Millisecond) // 模拟耗时操作
 	tracker.UpdateStepProgress("创建分析器实例")
 	
 	a := analyzer.NewAnalyzer(repoPath, analysisMonths)
@@ -146,9 +146,7 @@ func analyzeGitLog(repoPath string) error {
 	
 	stats, err := a.AnalyzeWithProgress(func(current, total int, message string) {
 		// 将analyzer的进度映射到这个步骤的进度更新
-		if current%10 == 0 || current == total { // 每10%或完成时更新
-			tracker.UpdateStepProgress(fmt.Sprintf("%s (%d%%)", message, current))
-		}
+		tracker.UpdateStepProgress(fmt.Sprintf("%s (%d%%)", message, current))
 	})
 	if err != nil {
 		tracker.FailStep(fmt.Sprintf("分析失败: %v", err))

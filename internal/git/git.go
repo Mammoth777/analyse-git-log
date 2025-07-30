@@ -304,48 +304,37 @@ func (r *Repository) getCommitStatsBatchOptimized(commits []GitCommit, progressC
 	}
 	
 	// Process commits in chunks to avoid command line length limits and memory issues
-	for start := 0; start < total; start += maxBatchSize {
-		end := start + maxBatchSize
-		if end > total {
-			end = total
-		}
-		
-		// Create hash list for this chunk
-		var hashes []string
-		for i := start; i < end; i++ {
-			hashes = append(hashes, commits[i].Hash)
-		}
-		
-		if progressCallback != nil {
-			progressCallback(start, total, fmt.Sprintf("处理提交块 %d-%d/%d...", start+1, end, total))
-		}
-		
-		err := r.processCommitStatsChunk(hashes, commitMap, progressCallback, start, total)
-		if err != nil {
-			// Fallback to individual processing if batch fails
-			if progressCallback != nil {
-				progressCallback(start, total, fmt.Sprintf("批量处理失败，回退到逐个处理 %d-%d/%d", start+1, end, total))
-			}
-			
-			for i := start; i < end; i++ {
-				additions, deletions, files, err := r.GetCommitStatsWithProgress(
-					commits[i].Hash,
-					progressCallback,
-					i+1,
-					total,
-				)
-				if err == nil {
-					commits[i].Additions = additions
-					commits[i].Deletions = deletions
-					commits[i].Files = files
-				}
-			}
-		}
-		
-		if progressCallback != nil {
-			progressCallback(end, total, fmt.Sprintf("完成提交块 %d-%d/%d", start+1, end, total))
-		}
-	}
+	   for start := 0; start < total; start += maxBatchSize {
+			   end := start + maxBatchSize
+			   if end > total {
+					   end = total
+			   }
+
+			   // Create hash list for this chunk
+			   var hashes []string
+			   for i := start; i < end; i++ {
+					   hashes = append(hashes, commits[i].Hash)
+			   }
+
+			   // 不再用块级进度，只在每个commit统计时回调
+			   err := r.processCommitStatsChunk(hashes, commitMap, progressCallback, start, total)
+			   if err != nil {
+					   // Fallback to individual processing if batch fails
+					   for i := start; i < end; i++ {
+							   additions, deletions, files, err := r.GetCommitStatsWithProgress(
+									   commits[i].Hash,
+									   progressCallback,
+									   i+1,
+									   total,
+							   )
+							   if err == nil {
+									   commits[i].Additions = additions
+									   commits[i].Deletions = deletions
+									   commits[i].Files = files
+							   }
+					   }
+			   }
+	   }
 	
 	return nil
 }

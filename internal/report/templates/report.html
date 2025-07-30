@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{if eq .Language "en"}}en{{else}}zh-CN{{end}}">
+<html lang="{{if eq .Language " en"}}en{{else}}zh-CN{{end}}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
     <!-- 移动端菜单切换按钮 -->
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
@@ -23,7 +25,7 @@
             <div class="logo">📊</div>
             <h3>Git 分析</h3>
         </div>
-        
+
         <!-- 基础分析 -->
         <div class="menu-group">
             <div class="group-label">基础分析</div>
@@ -136,668 +138,704 @@
 
     <!-- 主内容区域 -->
     <main class="main-content">
-            <header class="header">
-                <h1>{{.Messages.ReportTitle}}</h1>
-                <div class="subtitle">
-                    <h2>{{.ProjectName}}</h2>
-                    <p>{{.Messages.GeneratedOn}} {{.GeneratedAt.Format "2006-01-02 15:04:05"}}</p>
-                </div>
-            </header>
+        <header class="header">
+            <h1>{{.Messages.ReportTitle}}</h1>
+            <div class="subtitle">
+                <h2>{{.ProjectName}}</h2>
+                <p>{{.Messages.GeneratedOn}} {{.GeneratedAt.Format "2006-01-02 15:04:05"}}</p>
+            </div>
+        </header>
 
-            <!-- 项目概览 -->
-            <section id="overview-section" class="content-section">
-                <div class="section-header">
-                    <h2>📈 项目概览</h2>
-                    <p>项目的基本统计信息和整体概况</p>
-                </div>
+        <!-- 项目概览 -->
+        <section id="overview-section" class="content-section">
+            <div class="section-header">
+                <h2>📈 项目概览</h2>
+                <p>项目的基本统计信息和整体概况</p>
+            </div>
 
-                <div class="summary">
-                    <div class="stat-card">
-                        <h3>{{.Messages.TotalCommits}}</h3>
-                        <div class="stat-number">{{.Stats.TotalCommits}}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>{{.Messages.Contributors}}</h3>
-                        <div class="stat-number">{{len .Stats.AuthorStats}}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>{{.Messages.ActiveDays}}</h3>
-                        <div class="stat-number">{{.Stats.TimeStats.ActiveDays}}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>{{.Messages.ActivePeriod}}</h3>
-                        <div class="stat-text">{{.Stats.TimeStats.FirstCommit.Format "2006-01-02"}} to {{.Stats.TimeStats.LastCommit.Format "2006-01-02"}}</div>
-                    </div>
+            <div class="summary">
+                <div class="stat-card">
+                    <h3>{{.Messages.TotalCommits}}</h3>
+                    <div class="stat-number">{{.Stats.TotalCommits}}</div>
                 </div>
+                <div class="stat-card">
+                    <h3>{{.Messages.Contributors}}</h3>
+                    <div class="stat-number">{{len .Stats.AuthorStats}}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>{{.Messages.ActiveDays}}</h3>
+                    <div class="stat-number">{{.Stats.TimeStats.ActiveDays}}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>{{.Messages.ActivePeriod}}</h3>
+                    <div class="stat-text">{{.Stats.TimeStats.FirstCommit.Format "2006-01-02"}} to
+                        {{.Stats.TimeStats.LastCommit.Format "2006-01-02"}}</div>
+                </div>
+            </div>
 
-                <div class="files-section">
-                    <h3>{{.Messages.MostModifiedFiles}}</h3>
-                    <div class="files-list">
-                        {{range .FileData}}
-                        <div class="file-bar">
-                            <div class="file-bar-fill" data-count="{{.Count}}">
-                                <span class="file-name">{{.Name}}</span>
+            <div class="files-section">
+                <h3>{{.Messages.MostModifiedFiles}}</h3>
+                <div class="files-list">
+                    {{range .FileData}}
+                    <div class="file-bar">
+                        <div class="file-bar-fill" data-count="{{.Count}}">
+                            <span class="file-name">{{.Name}}</span>
+                        </div>
+                        <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </section>
+
+        <!-- 贡献者分析 -->
+        <section id="contributors-section" class="content-section">
+            <div class="section-header">
+                <h2>👥 贡献者分析</h2>
+                <p>开发者贡献统计和活跃度分析</p>
+            </div>
+            <div class="section-content">
+                <div class="contributors-layout">
+                    <div class="contributors-chart">
+                        <h3>{{.Messages.TopContributors}}</h3>
+                        <canvas id="authorsChart"></canvas>
+                    </div>
+                    <div class="contributors-list">
+                        <h3>详细统计</h3>
+                        <div class="authors-list">
+                            {{range .TopAuthors}}
+                            <div class="author-item">
+                                <div class="author-info">
+                                    {{if hasDeveloperProfile .Name $.DeveloperProfiles}}
+                                    <a href="{{getDeveloperProfileLink .Name $.DeveloperProfiles}}"
+                                        class="author-name-link">
+                                        <span class="author-name">{{.Name}}</span>
+                                    </a>
+                                    {{else}}
+                                    <span class="author-name">{{.Name}}</span>
+                                    {{end}}
+                                    <div class="author-metrics">
+                                        <div class="metric">
+                                            <span class="metric-label">提交数</span>
+                                            <span class="metric-value">{{.CommitCount}}</span>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-label">占比</span>
+                                            <span class="metric-value">{{printf "%.1f" .Percentage}}%</span>
+                                        </div>
+                                        <div class="metric">
+                                            <span class="metric-label">增删行</span>
+                                            <span class="metric-value">+{{.Additions}}/-{{.Deletions}}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="file-count">{{.Count}} {{$.Messages.Modifications}}</span>
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 活动时间分析 -->
+        <section id="activity-section" class="content-section">
+            <div class="section-header">
+                <h2>⏰ 活动时间分析</h2>
+                <p>提交活动的时间模式和频率分析</p>
+            </div>
+            <div class="section-content">
+                <!-- 时间线图表 - 全宽显示 -->
+                <div class="chart-container full-width">
+                    <h3>{{.Messages.CommitTimeline}}</h3>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+
+                <!-- 小时和日活跃度 - 双列显示 -->
+                <div class="charts-grid-2">
+                    <div class="chart-container medium">
+                        <h3>{{.Messages.HourlyActivity}}</h3>
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                    <div class="chart-container medium">
+                        <h3>{{.Messages.DailyActivity}}</h3>
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分支结构 -->
+        <section id="branch-section" class="content-section">
+            <div class="section-header">
+                <h2>🌲 分支概览</h2>
+                <p>Git分支状态和生命周期分析</p>
+            </div>
+            <div class="section-content">
+                {{if .Stats.BranchData}}
+                <!-- 分支摘要 -->
+                <div class="chart-container">
+                    <h3>📊 分支概览</h3>
+                    <div class="branch-summary">
+                        <div class="summary-card">
+                            <div class="summary-title">分支总数</div>
+                            <div class="summary-value">{{.Stats.BranchData.Summary.TotalBranches}}</div>
+                        </div>
+                        <div class="summary-card active">
+                            <div class="summary-title">{{.AnalysisMonths}}月内活跃分支</div>
+                            <div class="summary-value">{{.Stats.BranchData.Summary.ActiveBranchesInRange}}</div>
+                        </div>
+                        <div class="summary-card highlight">
+                            <div class="summary-title">最近半个月活跃分支</div>
+                            <div class="summary-value">{{len .Stats.BranchData.Summary.RecentActiveBranches}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近活跃分支列表与详情 -->
+
+                {{if .Stats.BranchData.Summary.RecentActiveBranches}}
+                <div class="chart-container branch-table-chart">
+                    <h3>📋 最近半个月活跃分支详情</h3>
+                    <div style="text-align:right; margin-bottom:10px;">
+                    </div>
+                    <div class="branch-table-container">
+                        <table class="branch-table" id="branchTable">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th style="position:relative; min-width:180px;">
+                                        <span>分支名称</span>
+                                        <input type="text" id="branchFilterInput" class="branch-filter-input"
+                                            placeholder="筛选...">
+                                    </th>
+                                    <th>最后更新</th>
+                                    <th>主要贡献者</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range $index, $branch := .Stats.BranchData.Summary.RecentActiveBranches}}
+                                <tr class="branch-row" data-status="{{$branch.Status}}">
+                                    <td class="branch-index">{{add $index 1}}</td>
+                                    <td class="branch-name" title="{{$branch.Name}}">
+                                        <span class="branch-icon" data-type="{{$branch.Type}}">{{if eq $branch.Type
+                                            "main"}}🏠{{else if eq $branch.Type "feature"}}🌟{{else if eq $branch.Type
+                                            "hotfix"}}🔥{{else if eq $branch.Type "release"}}🚀{{else}}📦{{end}}</span>
+                                        {{$branch.Name}}
+                                    </td>
+                                    <td class="last-commit">{{$branch.LastCommit.Format "2006-01-02 15:04"}}{{ if
+                                        $branch.LastCommitHash }} ({{printf "%.7s" $branch.LastCommitHash}}){{ end }}
+                                    </td>
+                                    <td class="authors">
+                                        {{range $i, $author := $branch.MainAuthors}}
+                                        {{if $i}}, {{end}}
+                                        <span class="author">{{$author.Name}} ({{printf "%.0f"
+                                            $author.Percentage}}%)</span>
+                                        {{end}}
+                                    </td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <script>
+                    // 分支名筛选功能
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var input = document.getElementById('branchFilterInput');
+                        var table = document.getElementById('branchTable');
+                        if (input && table) {
+                            input.addEventListener('input', function () {
+                                var filter = input.value.trim().toLowerCase();
+                                var rows = table.querySelectorAll('tbody tr');
+                                rows.forEach(function (row) {
+                                    var nameCell = row.querySelector('.branch-name');
+                                    if (nameCell) {
+                                        var branchName = nameCell.textContent.trim().toLowerCase();
+                                        if (branchName.indexOf(filter) !== -1) {
+                                            row.style.display = '';
+                                        } else {
+                                            row.style.display = 'none';
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    });
+                </script>
+                {{end}}
+
+
+
+                <!-- 生命周期分析 -->
+                <div class="chart-container lifecycle-container">
+                    <h3>🔄 生命周期分析</h3>
+                    <div class="lifecycle-placeholder">
+                        <div class="placeholder-content">
+                            <span class="placeholder-icon">🚧</span>
+                            <p class="placeholder-text">功能开发中</p>
+                            <small class="placeholder-note">生命周期分析模块正在重构，敬请期待</small>
+                        </div>
+                    </div>
+                </div>
+                {{else}}
+                <div class="no-data">
+                    <p>{{.Messages.NoDataAvailable}}</p>
+                </div>
+                {{end}}
+            </div>
+        </section>
+
+        <!-- 代码健康 -->
+        <section id="health-section" class="content-section">
+            <div class="section-header">
+                <h2>🏥 代码健康</h2>
+                <p>代码质量评估、技术债务和重构建议</p>
+            </div>
+            {{if .CodeHealthMetrics}}
+            <div class="health-header">
+                <div class="health-score">
+                    <span class="score-label">健康评分</span>
+                    <span class="score-value">{{printf "%.0f" (mul .CodeHealthMetrics.HealthScore 100)}}</span>
+                </div>
+            </div>
+
+            <div class="health-summary">
+                <p>{{.CodeHealthMetrics.HealthSummary}} (满分100分)</p>
+            </div>
+
+            <div class="health-cards">
+                {{if .CodeHealthMetrics.TechnicalDebtHotspots}}
+                <div class="health-card tech-debt">
+                    <div class="card-header">
+                        <span class="card-icon">🔥</span>
+                        <span class="card-title">技术债务热点</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.TechnicalDebtHotspots}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.TechnicalDebtHotspots 0 5}}
+                        <div class="hotspot-item">
+                            <div class="hotspot-file">{{.FilePath}}</div>
+                            <div class="hotspot-details">
+                                <span class="risk-score">风险: {{printf "%.2f" .RiskScore}}</span>
+                                <span class="mod-count">修改: {{.ModificationFreq}}次</span>
+                                <span class="reason">{{.Reason}}</span>
+                            </div>
                         </div>
                         {{end}}
                     </div>
                 </div>
-            </section>
+                {{end}}
 
-            <!-- 贡献者分析 -->
-            <section id="contributors-section" class="content-section">
-                <div class="section-header">
-                    <h2>👥 贡献者分析</h2>
-                    <p>开发者贡献统计和活跃度分析</p>
-                </div>
-                <div class="section-content">
-                    <div class="contributors-layout">
-                        <div class="contributors-chart">
-                            <h3>{{.Messages.TopContributors}}</h3>
-                            <canvas id="authorsChart"></canvas>
-                        </div>
-                        <div class="contributors-list">
-                            <h3>详细统计</h3>
-                            <div class="authors-list">
-                                {{range .TopAuthors}}
-                                <div class="author-item">
-                                    <div class="author-info">
-                                        {{if hasDeveloperProfile .Name $.DeveloperProfiles}}
-                                        <a href="{{getDeveloperProfileLink .Name $.DeveloperProfiles}}" class="author-name-link">
-                                            <span class="author-name">{{.Name}}</span>
-                                        </a>
-                                        {{else}}
-                                        <span class="author-name">{{.Name}}</span>
-                                        {{end}}
-                                        <div class="author-metrics">
-                                            <div class="metric">
-                                                <span class="metric-label">提交数</span>
-                                                <span class="metric-value">{{.CommitCount}}</span>
-                                            </div>
-                                            <div class="metric">
-                                                <span class="metric-label">占比</span>
-                                                <span class="metric-value">{{printf "%.1f" .Percentage}}%</span>
-                                            </div>
-                                            <div class="metric">
-                                                <span class="metric-label">增删行</span>
-                                                <span class="metric-value">+{{.Additions}}/-{{.Deletions}}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {{end}}
+                {{if .CodeHealthMetrics.RefactoringSignals}}
+                <div class="health-card refactor">
+                    <div class="card-header">
+                        <span class="card-icon">🔧</span>
+                        <span class="card-title">重构信号</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.RefactoringSignals}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.RefactoringSignals 0 5}}
+                        <div class="signal-item">
+                            <div class="signal-file">{{.FilePath}}</div>
+                            <div class="signal-details">
+                                <span class="signal-strength">{{.RefactoringSignal}}信号</span>
+                                <span class="changes-count">{{.ShortTermChanges}}次修改</span>
+                                <span class="time-window">{{.IntensiveModDays}}天内</span>
                             </div>
                         </div>
+                        {{end}}
                     </div>
-                </div>
-            </section>
-
-            <!-- 活动时间分析 -->
-            <section id="activity-section" class="content-section">
-                <div class="section-header">
-                    <h2>⏰ 活动时间分析</h2>
-                    <p>提交活动的时间模式和频率分析</p>
-                </div>
-                <div class="section-content">
-                    <!-- 时间线图表 - 全宽显示 -->
-                    <div class="chart-container full-width">
-                        <h3>{{.Messages.CommitTimeline}}</h3>
-                        <canvas id="timelineChart"></canvas>
-                    </div>
-                    
-                    <!-- 小时和日活跃度 - 双列显示 -->
-                    <div class="charts-grid-2">
-                        <div class="chart-container medium">
-                            <h3>{{.Messages.HourlyActivity}}</h3>
-                            <canvas id="hourlyChart"></canvas>
-                        </div>
-                        <div class="chart-container medium">
-                            <h3>{{.Messages.DailyActivity}}</h3>
-                            <canvas id="dailyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 分支结构 -->
-            <section id="branch-section" class="content-section">
-                <div class="section-header">
-                    <h2>🌲 分支概览</h2>
-                    <p>Git分支状态和生命周期分析</p>
-                </div>
-                <div class="section-content">
-                    {{if .Stats.BranchData}}
-                    <!-- 分支摘要 -->
-                    <div class="chart-container">
-                        <h3>📊 分支概览</h3>
-                        <div class="branch-summary">
-                            <div class="summary-card">
-                                <div class="summary-title">分支总数</div>
-                                <div class="summary-value">{{.Stats.BranchData.Summary.TotalBranches}}</div>
-                            </div>
-                            <div class="summary-card active">
-                                <div class="summary-title">{{.AnalysisMonths}}月内活跃分支</div>
-                                <div class="summary-value">{{.Stats.BranchData.Summary.ActiveBranchesInRange}}</div>
-                            </div>
-                            <div class="summary-card highlight">
-                                <div class="summary-title">最近半个月活跃分支</div>
-                                <div class="summary-value">{{len .Stats.BranchData.Summary.RecentActiveBranches}}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 最近活跃分支列表与详情 -->
-                    {{if .Stats.BranchData.Summary.RecentActiveBranches}}
-                    <div class="chart-container branch-table-chart">
-                        <h3>📋 最近半个月活跃分支详情</h3>
-                        <div class="branch-table-container">
-                            <table class="branch-table">
-                                <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>分支名称</th>
-                                        <th>生命周期</th>
-                                        <th>最后更新</th>
-                                        <th>主要贡献者</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{range $index, $branch := .Stats.BranchData.Summary.RecentActiveBranches}}
-                                    <tr class="branch-row" data-status="{{$branch.Status}}">
-                                        <td class="branch-index">{{add $index 1}}</td>
-                                        <td class="branch-name" title="{{$branch.Name}}">
-                                            <span class="branch-icon" data-type="{{$branch.Type}}">{{if eq $branch.Type "main"}}🏠{{else if eq $branch.Type "feature"}}🌟{{else if eq $branch.Type "hotfix"}}🔥{{else if eq $branch.Type "release"}}🚀{{else}}📦{{end}}</span>
-                                            {{$branch.Name}}
-                                        </td>
-                                        <td class="lifespan">{{$branch.LifespanDays}}天</td>
-                                        <td class="last-commit">{{$branch.LastCommit.Format "2006-01-02 15:04"}}{{ if $branch.LastCommitHash }} ({{printf "%.7s" $branch.LastCommitHash}}){{ end }}</td>
-                                        <td class="authors">
-                                            {{range $i, $author := $branch.MainAuthors}}
-                                                {{if $i}}, {{end}}
-                                                <span class="author">{{$author.Name}} ({{printf "%.0f" $author.Percentage}}%)</span>
-                                            {{end}}
-                                        </td>
-                                    </tr>
-                                    {{end}}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    {{end}}
-
-
-
-                    <!-- 生命周期分析 -->
-                    <div class="chart-container lifecycle-container">
-                        <h3>🔄 生命周期分析</h3>
-                        <div class="lifecycle-placeholder">
-                            <div class="placeholder-content">
-                                <span class="placeholder-icon">🚧</span>
-                                <p class="placeholder-text">功能开发中</p>
-                                <small class="placeholder-note">生命周期分析模块正在重构，敬请期待</small>
-                            </div>
-                        </div>
-                    </div>
-                    {{else}}
-                    <div class="no-data">
-                        <p>{{.Messages.NoDataAvailable}}</p>
-                    </div>
-                    {{end}}
-                </div>
-            </section>
-
-            <!-- 代码健康 -->
-            <section id="health-section" class="content-section">
-                <div class="section-header">
-                    <h2>🏥 代码健康</h2>
-                    <p>代码质量评估、技术债务和重构建议</p>
-                </div>
-                {{if .CodeHealthMetrics}}
-                <div class="health-header">
-                    <div class="health-score">
-                        <span class="score-label">健康评分</span>
-                        <span class="score-value">{{printf "%.0f" (mul .CodeHealthMetrics.HealthScore 100)}}</span>
-                    </div>
-                </div>
-
-                <div class="health-summary">
-                    <p>{{.CodeHealthMetrics.HealthSummary}} (满分100分)</p>
-                </div>
-
-                <div class="health-cards">
-                    {{if .CodeHealthMetrics.TechnicalDebtHotspots}}
-                    <div class="health-card tech-debt">
-                        <div class="card-header">
-                            <span class="card-icon">🔥</span>
-                            <span class="card-title">技术债务热点</span>
-                            <span class="card-count">{{len .CodeHealthMetrics.TechnicalDebtHotspots}}</span>
-                        </div>
-                        <div class="card-content">
-                            {{range slice .CodeHealthMetrics.TechnicalDebtHotspots 0 5}}
-                            <div class="hotspot-item">
-                                <div class="hotspot-file">{{.FilePath}}</div>
-                                <div class="hotspot-details">
-                                    <span class="risk-score">风险: {{printf "%.2f" .RiskScore}}</span>
-                                    <span class="mod-count">修改: {{.ModificationFreq}}次</span>
-                                    <span class="reason">{{.Reason}}</span>
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
-                    </div>
-                    {{end}}
-
-                    {{if .CodeHealthMetrics.RefactoringSignals}}
-                    <div class="health-card refactor">
-                        <div class="card-header">
-                            <span class="card-icon">🔧</span>
-                            <span class="card-title">重构信号</span>
-                            <span class="card-count">{{len .CodeHealthMetrics.RefactoringSignals}}</span>
-                        </div>
-                        <div class="card-content">
-                            {{range slice .CodeHealthMetrics.RefactoringSignals 0 5}}
-                            <div class="signal-item">
-                                <div class="signal-file">{{.FilePath}}</div>
-                                <div class="signal-details">
-                                    <span class="signal-strength">{{.RefactoringSignal}}信号</span>
-                                    <span class="changes-count">{{.ShortTermChanges}}次修改</span>
-                                    <span class="time-window">{{.IntensiveModDays}}天内</span>
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
-                    </div>
-                    {{end}}
-
-                    {{if .CodeHealthMetrics.CodeConcentrationIssues}}
-                    <div class="health-card concentration">
-                        <div class="card-header">
-                            <span class="card-icon">⚠️</span>
-                            <span class="card-title">代码集中度问题</span>
-                            <span class="card-count">{{len .CodeHealthMetrics.CodeConcentrationIssues}}</span>
-                        </div>
-                        <div class="card-content">
-                            {{range slice .CodeHealthMetrics.CodeConcentrationIssues 0 3}}
-                            <div class="concentration-item">
-                                <div class="concentration-file">{{.FilePath}}</div>
-                                <div class="concentration-details">
-                                    <span class="concentration-level">{{.ConcentrationLevel}}</span>
-                                    <span class="change-ratio">{{printf "%.1f" (mul .ChangeRatio 100)}}%</span>
-                                    <span class="total-changes">{{.TotalChanges}}次修改</span>
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
-                    </div>
-                    {{end}}
-
-                    {{if .CodeHealthMetrics.StabilityIndicators}}
-                    <div class="health-card stability">
-                        <div class="card-header">
-                            <span class="card-icon">🛡️</span>
-                            <span class="card-title">稳定性指标</span>
-                            <span class="card-count">{{len .CodeHealthMetrics.StabilityIndicators}}</span>
-                        </div>
-                        <div class="card-content">
-                            {{range slice .CodeHealthMetrics.StabilityIndicators 0 5}}
-                            <div class="stability-item">
-                                <div class="stability-file">{{.FilePath}}</div>
-                                <div class="stability-details">
-                                    <span class="stability-level {{.StabilityLevel}}">{{.StabilityLevel}}</span>
-                                    <span class="shake-index">震荡指数: {{printf "%.2f" .ShakeIndex}}</span>
-                                    <span class="time-spread">时间分布: {{printf "%.2f" .TimeSpread}}</span>
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
-                    </div>
-                    {{end}}
-                </div>
-                {{else}}
-                <div class="empty-section">
-                    <p>代码健康分析功能暂时不可用</p>
                 </div>
                 {{end}}
-            </section>
 
-            <!-- AI 分析 -->
-            <section id="ai-section" class="content-section">
-                <div class="section-header">
-                    <h2>🤖 AI 分析</h2>
-                    <p>基于人工智能的代码模式和开发习惯分析</p>
-                </div>
-                {{if .AIStatus.Available}}
-                <div class="ai-analysis-cards">
-                    <div class="ai-card analysis">
-                        <div class="card-header" onclick="toggleAIAnalysis()">
-                            <span class="card-icon">🧠</span>
-                            <span class="card-title">智能分析报告</span>
-                            <span class="toggle-icon" id="aiAnalysis-icon">▼</span>
-                        </div>
-                        <div class="card-content" id="aiAnalysis-content">
-                            <div class="analysis-loading">
-                                <p>点击展开查看详细分析...</p>
+                {{if .CodeHealthMetrics.CodeConcentrationIssues}}
+                <div class="health-card concentration">
+                    <div class="card-header">
+                        <span class="card-icon">⚠️</span>
+                        <span class="card-title">代码集中度问题</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.CodeConcentrationIssues}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.CodeConcentrationIssues 0 3}}
+                        <div class="concentration-item">
+                            <div class="concentration-file">{{.FilePath}}</div>
+                            <div class="concentration-details">
+                                <span class="concentration-level">{{.ConcentrationLevel}}</span>
+                                <span class="change-ratio">{{printf "%.1f" (mul .ChangeRatio 100)}}%</span>
+                                <span class="total-changes">{{.TotalChanges}}次修改</span>
                             </div>
                         </div>
+                        {{end}}
                     </div>
-                </div>
-
-                <!-- 隐藏的原始数据，供JavaScript解析使用 -->
-                <script type="text/plain" id="aiAnalysisData">{{.AIAnalysis}}</script>
-                {{else}}
-                <div class="empty-section">
-                    {{if eq .AIStatus.ErrorType "disabled"}}
-                    <div class="ai-disabled">
-                        <div class="icon">🤖</div>
-                        <h3>AI分析未开启</h3>
-                        <p>AI分析功能可以为您提供智能化的代码分析和建议</p>
-                        <div class="enable-instructions">
-                            <h4>开启方式：</h4>
-                            <div class="code-block">
-                                <code>./git-log-analyzer --ai</code>
-                            </div>
-                            <p>或者设置环境变量后直接运行：</p>
-                            <div class="code-block">
-                                <code>export AI_API_KEY="your-api-key"<br>./git-log-analyzer --ai</code>
-                            </div>
-                        </div>
-                    </div>
-                    {{else if eq .AIStatus.ErrorType "config_error"}}
-                    <div class="ai-error">
-                        <div class="icon">⚠️</div>
-                        <h3>AI分析配置错误</h3>
-                        <p>{{.AIStatus.ErrorMessage}}</p>
-                        <div class="config-instructions">
-                            <h4>配置方法：</h4>
-                            <ol>
-                                <li>设置AI API密钥环境变量：
-                                    <div class="code-block">
-                                        <code>export AI_API_KEY="your-openai-api-key"</code>
-                                    </div>
-                                </li>
-                                <li>（可选）设置其他AI配置：
-                                    <div class="code-block">
-                                        <code>export AI_MODEL="gpt-3.5-turbo"<br>export AI_MAX_TOKENS="2000"</code>
-                                    </div>
-                                </li>
-                                <li>重新运行分析：
-                                    <div class="code-block">
-                                        <code>./git-log-analyzer --ai</code>
-                                    </div>
-                                </li>
-                            </ol>
-                        </div>
-                    </div>
-                    {{else}}
-                    <div class="ai-error">
-                        <div class="icon">❌</div>
-                        <h3>AI分析失败</h3>
-                        <p>{{.AIStatus.ErrorMessage}}</p>
-                        <div class="troubleshoot-instructions">
-                            <h4>故障排除：</h4>
-                            <ul>
-                                <li>检查网络连接是否正常</li>
-                                <li>验证API密钥是否有效</li>
-                                <li>确认API配额是否充足</li>
-                                <li>检查防火墙设置</li>
-                            </ul>
-                        </div>
-                    </div>
-                    {{end}}
                 </div>
                 {{end}}
-            </section>
 
-            <!-- 空白的未来功能区域 -->
-            
-            <!-- 质量评估 -->
-            <section id="quality-section" class="content-section">
-                <div class="section-header">
-                    <h2>✨ 质量评估</h2>
-                    <p>全面的代码质量分析和评分系统</p>
+                {{if .CodeHealthMetrics.StabilityIndicators}}
+                <div class="health-card stability">
+                    <div class="card-header">
+                        <span class="card-icon">🛡️</span>
+                        <span class="card-title">稳定性指标</span>
+                        <span class="card-count">{{len .CodeHealthMetrics.StabilityIndicators}}</span>
+                    </div>
+                    <div class="card-content">
+                        {{range slice .CodeHealthMetrics.StabilityIndicators 0 5}}
+                        <div class="stability-item">
+                            <div class="stability-file">{{.FilePath}}</div>
+                            <div class="stability-details">
+                                <span class="stability-level {{.StabilityLevel}}">{{.StabilityLevel}}</span>
+                                <span class="shake-index">震荡指数: {{printf "%.2f" .ShakeIndex}}</span>
+                                <span class="time-spread">时间分布: {{printf "%.2f" .TimeSpread}}</span>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>质量评估功能正在开发中，将提供更全面的代码质量分析。</p>
-                        <ul class="feature-list">
-                            <li>• 代码风格一致性检查</li>
-                            <li>• 循环复杂度分析</li>
-                            <li>• 可读性评分</li>
-                            <li>• 注释覆盖率统计</li>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="empty-section">
+                <p>代码健康分析功能暂时不可用</p>
+            </div>
+            {{end}}
+        </section>
+
+        <!-- AI 分析 -->
+        <section id="ai-section" class="content-section">
+            <div class="section-header">
+                <h2>🤖 AI 分析</h2>
+                <p>基于人工智能的代码模式和开发习惯分析</p>
+            </div>
+            {{if .AIStatus.Available}}
+            <div class="ai-analysis-cards">
+                <div class="ai-card analysis">
+                    <div class="card-header" onclick="toggleAIAnalysis()">
+                        <span class="card-icon">🧠</span>
+                        <span class="card-title">智能分析报告</span>
+                        <span class="toggle-icon" id="aiAnalysis-icon">▼</span>
+                    </div>
+                    <div class="card-content" id="aiAnalysis-content">
+                        <div class="analysis-loading">
+                            <p>点击展开查看详细分析...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 隐藏的原始数据，供JavaScript解析使用 -->
+            <script type="text/plain" id="aiAnalysisData">{{.AIAnalysis}}</script>
+            {{else}}
+            <div class="empty-section">
+                {{if eq .AIStatus.ErrorType "disabled"}}
+                <div class="ai-disabled">
+                    <div class="icon">🤖</div>
+                    <h3>AI分析未开启</h3>
+                    <p>AI分析功能可以为您提供智能化的代码分析和建议</p>
+                    <div class="enable-instructions">
+                        <h4>开启方式：</h4>
+                        <div class="code-block">
+                            <code>./git-log-analyzer --ai</code>
+                        </div>
+                        <p>或者设置环境变量后直接运行：</p>
+                        <div class="code-block">
+                            <code>export AI_API_KEY="your-api-key"<br>./git-log-analyzer --ai</code>
+                        </div>
+                    </div>
+                </div>
+                {{else if eq .AIStatus.ErrorType "config_error"}}
+                <div class="ai-error">
+                    <div class="icon">⚠️</div>
+                    <h3>AI分析配置错误</h3>
+                    <p>{{.AIStatus.ErrorMessage}}</p>
+                    <div class="config-instructions">
+                        <h4>配置方法：</h4>
+                        <ol>
+                            <li>设置AI API密钥环境变量：
+                                <div class="code-block">
+                                    <code>export AI_API_KEY="your-openai-api-key"</code>
+                                </div>
+                            </li>
+                            <li>（可选）设置其他AI配置：
+                                <div class="code-block">
+                                    <code>export AI_MODEL="gpt-3.5-turbo"<br>export AI_MAX_TOKENS="2000"</code>
+                                </div>
+                            </li>
+                            <li>重新运行分析：
+                                <div class="code-block">
+                                    <code>./git-log-analyzer --ai</code>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                {{else}}
+                <div class="ai-error">
+                    <div class="icon">❌</div>
+                    <h3>AI分析失败</h3>
+                    <p>{{.AIStatus.ErrorMessage}}</p>
+                    <div class="troubleshoot-instructions">
+                        <h4>故障排除：</h4>
+                        <ul>
+                            <li>检查网络连接是否正常</li>
+                            <li>验证API密钥是否有效</li>
+                            <li>确认API配额是否充足</li>
+                            <li>检查防火墙设置</li>
                         </ul>
                     </div>
                 </div>
-            </section>
+                {{end}}
+            </div>
+            {{end}}
+        </section>
 
-            <!-- 技术债务 -->
-            <section id="debt-section" class="content-section">
-                <div class="section-header">
-                    <h2>🔧 技术债务</h2>
-                    <p>技术债务识别、量化和偿还建议</p>
-                </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>技术债务分析功能正在开发中，帮助团队管理和偿还技术债务。</p>
-                        <ul class="feature-list">
-                            <li>• 债务热点地图</li>
-                            <li>• 债务累积趋势</li>
-                            <li>• 偿还优先级建议</li>
-                            <li>• ROI 计算器</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+        <!-- 空白的未来功能区域 -->
 
-            <!-- 开发模式 -->
-            <section id="patterns-section" class="content-section">
-                <div class="section-header">
-                    <h2>� 开发模式</h2>
-                    <p>智能识别团队开发模式和最佳实践</p>
+        <!-- 质量评估 -->
+        <section id="quality-section" class="content-section">
+            <div class="section-header">
+                <h2>✨ 质量评估</h2>
+                <p>全面的代码质量分析和评分系统</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能开发中</h3>
+                    <p>质量评估功能正在开发中，将提供更全面的代码质量分析。</p>
+                    <ul class="feature-list">
+                        <li>• 代码风格一致性检查</li>
+                        <li>• 循环复杂度分析</li>
+                        <li>• 可读性评分</li>
+                        <li>• 注释覆盖率统计</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>开发模式分析功能基于AI算法，识别团队的工作模式。</p>
-                        <ul class="feature-list">
-                            <li>• 提交模式识别</li>
-                            <li>• 开发节奏分析</li>
-                            <li>• 工作时间偏好</li>
-                            <li>• 个人风格画像</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 协作分析 -->
-            <section id="collaboration-section" class="content-section">
-                <div class="section-header">
-                    <h2>🤝 协作分析</h2>
-                    <p>团队协作效率和知识流动分析</p>
+        <!-- 技术债务 -->
+        <section id="debt-section" class="content-section">
+            <div class="section-header">
+                <h2>🔧 技术债务</h2>
+                <p>技术债务识别、量化和偿还建议</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能开发中</h3>
+                    <p>技术债务分析功能正在开发中，帮助团队管理和偿还技术债务。</p>
+                    <ul class="feature-list">
+                        <li>• 债务热点地图</li>
+                        <li>• 债务累积趋势</li>
+                        <li>• 偿还优先级建议</li>
+                        <li>• ROI 计算器</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能开发中</h3>
-                        <p>协作分析功能将深入分析团队协作模式和效率。</p>
-                        <ul class="feature-list">
-                            <li>• 协作网络图</li>
-                            <li>• 知识传播路径</li>
-                            <li>• 代码评审效率</li>
-                            <li>• 跨团队协作分析</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 安全分析 -->
-            <section id="security-section" class="content-section">
-                <div class="section-header">
-                    <h2>�🔒 安全分析</h2>
-                    <p>代码安全漏洞检测和风险评估</p>
+        <!-- 开发模式 -->
+        <section id="patterns-section" class="content-section">
+            <div class="section-header">
+                <h2>� 开发模式</h2>
+                <p>智能识别团队开发模式和最佳实践</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能开发中</h3>
+                    <p>开发模式分析功能基于AI算法，识别团队的工作模式。</p>
+                    <ul class="feature-list">
+                        <li>• 提交模式识别</li>
+                        <li>• 开发节奏分析</li>
+                        <li>• 工作时间偏好</li>
+                        <li>• 个人风格画像</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能计划中</h3>
-                        <p>安全分析功能正在规划中，将为您的代码提供全面的安全保障。</p>
-                        <ul class="feature-list">
-                            <li>• 安全漏洞扫描</li>
-                            <li>• 敏感信息检测</li>
-                            <li>• 依赖安全分析</li>
-                            <li>• 安全最佳实践建议</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 性能分析 -->
-            <section id="performance-section" class="content-section">
-                <div class="section-header">
-                    <h2>⚡ 性能分析</h2>
-                    <p>代码性能热点和优化建议</p>
+        <!-- 协作分析 -->
+        <section id="collaboration-section" class="content-section">
+            <div class="section-header">
+                <h2>🤝 协作分析</h2>
+                <p>团队协作效率和知识流动分析</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能开发中</h3>
+                    <p>协作分析功能将深入分析团队协作模式和效率。</p>
+                    <ul class="feature-list">
+                        <li>• 协作网络图</li>
+                        <li>• 知识传播路径</li>
+                        <li>• 代码评审效率</li>
+                        <li>• 跨团队协作分析</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能计划中</h3>
-                        <p>性能分析功能正在规划中，帮助您识别和优化性能瓶颈。</p>
-                        <ul class="feature-list">
-                            <li>• 性能热点识别</li>
-                            <li>• 算法复杂度分析</li>
-                            <li>• 内存使用优化</li>
-                            <li>• 性能回归检测</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 依赖分析 -->
-            <section id="dependencies-section" class="content-section">
-                <div class="section-header">
-                    <h2>📦 依赖分析</h2>
-                    <p>项目依赖关系和版本管理分析</p>
+        <!-- 安全分析 -->
+        <section id="security-section" class="content-section">
+            <div class="section-header">
+                <h2>�🔒 安全分析</h2>
+                <p>代码安全漏洞检测和风险评估</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能计划中</h3>
+                    <p>安全分析功能正在规划中，将为您的代码提供全面的安全保障。</p>
+                    <ul class="feature-list">
+                        <li>• 安全漏洞扫描</li>
+                        <li>• 敏感信息检测</li>
+                        <li>• 依赖安全分析</li>
+                        <li>• 安全最佳实践建议</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能计划中</h3>
-                        <p>依赖分析功能正在规划中，提供全方位的依赖管理洞察。</p>
-                        <ul class="feature-list">
-                            <li>• 依赖树可视化</li>
-                            <li>• 版本兼容性检查</li>
-                            <li>• 过时依赖检测</li>
-                            <li>• 许可证合规分析</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 生产力分析 -->
-            <section id="productivity-section" class="content-section">
-                <div class="section-header">
-                    <h2>📊 生产力分析</h2>
-                    <p>团队和个人生产力深度分析</p>
+        <!-- 性能分析 -->
+        <section id="performance-section" class="content-section">
+            <div class="section-header">
+                <h2>⚡ 性能分析</h2>
+                <p>代码性能热点和优化建议</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能计划中</h3>
+                    <p>性能分析功能正在规划中，帮助您识别和优化性能瓶颈。</p>
+                    <ul class="feature-list">
+                        <li>• 性能热点识别</li>
+                        <li>• 算法复杂度分析</li>
+                        <li>• 内存使用优化</li>
+                        <li>• 性能回归检测</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能规划中</h3>
-                        <p>生产力分析功能正在规划中，基于多维度数据提供生产力洞察。</p>
-                        <ul class="feature-list">
-                            <li>• 效率波动分析</li>
-                            <li>• 生产力趋势预测</li>
-                            <li>• 工作负载平衡分析</li>
-                            <li>• 瓶颈识别与建议</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 学习曲线 -->
-            <section id="learning-section" class="content-section">
-                <div class="section-header">
-                    <h2>📚 学习曲线</h2>
-                    <p>开发者成长轨迹和技能发展分析</p>
+        <!-- 依赖分析 -->
+        <section id="dependencies-section" class="content-section">
+            <div class="section-header">
+                <h2>📦 依赖分析</h2>
+                <p>项目依赖关系和版本管理分析</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能计划中</h3>
+                    <p>依赖分析功能正在规划中，提供全方位的依赖管理洞察。</p>
+                    <ul class="feature-list">
+                        <li>• 依赖树可视化</li>
+                        <li>• 版本兼容性检查</li>
+                        <li>• 过时依赖检测</li>
+                        <li>• 许可证合规分析</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能规划中</h3>
-                        <p>学习曲线分析功能正在规划中，追踪开发者的成长历程。</p>
-                        <ul class="feature-list">
-                            <li>• 技能成长轨迹</li>
-                            <li>• 学习效率评估</li>
-                            <li>• 知识领域扩展分析</li>
-                            <li>• 导师关系识别</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 时间轴热力图 -->
-            <section id="timeline-section" class="content-section">
-                <div class="section-header">
-                    <h2>📅 时间轴热力图</h2>
-                    <p>项目活动的时空分布可视化</p>
+        <!-- 生产力分析 -->
+        <section id="productivity-section" class="content-section">
+            <div class="section-header">
+                <h2>📊 生产力分析</h2>
+                <p>团队和个人生产力深度分析</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能规划中</h3>
+                    <p>生产力分析功能正在规划中，基于多维度数据提供生产力洞察。</p>
+                    <ul class="feature-list">
+                        <li>• 效率波动分析</li>
+                        <li>• 生产力趋势预测</li>
+                        <li>• 工作负载平衡分析</li>
+                        <li>• 瓶颈识别与建议</li>
+                    </ul>
                 </div>
-                <div class="empty-section">
-                    <div class="coming-soon">
-                        <div class="icon">🚧</div>
-                        <h3>功能规划中</h3>
-                        <p>时间轴热力图功能正在规划中，提供直观的活动分布视图。</p>
-                        <ul class="feature-list">
-                            <li>• 交互式时间轴</li>
-                            <li>• 多维度热力图</li>
-                            <li>• 活动密度分析</li>
-                            <li>• 趋势模式识别</li>
-                        </ul>
-                    </div>
+            </div>
+        </section>
+
+        <!-- 学习曲线 -->
+        <section id="learning-section" class="content-section">
+            <div class="section-header">
+                <h2>📚 学习曲线</h2>
+                <p>开发者成长轨迹和技能发展分析</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能规划中</h3>
+                    <p>学习曲线分析功能正在规划中，追踪开发者的成长历程。</p>
+                    <ul class="feature-list">
+                        <li>• 技能成长轨迹</li>
+                        <li>• 学习效率评估</li>
+                        <li>• 知识领域扩展分析</li>
+                        <li>• 导师关系识别</li>
+                    </ul>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
+
+        <!-- 时间轴热力图 -->
+        <section id="timeline-section" class="content-section">
+            <div class="section-header">
+                <h2>📅 时间轴热力图</h2>
+                <p>项目活动的时空分布可视化</p>
+            </div>
+            <div class="empty-section">
+                <div class="coming-soon">
+                    <div class="icon">🚧</div>
+                    <h3>功能规划中</h3>
+                    <p>时间轴热力图功能正在规划中，提供直观的活动分布视图。</p>
+                    <ul class="feature-list">
+                        <li>• 交互式时间轴</li>
+                        <li>• 多维度热力图</li>
+                        <li>• 活动密度分析</li>
+                        <li>• 趋势模式识别</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script src="charts.js"></script>
     <script>
         const reportData = {
             authors: {{.TopAuthors | toJSON}},
-            hourly: {{.HourlyData | toJSON}},
-            daily: {{.DailyData | toJSON}},
-            timeline: {{.CommitTimeline | toJSON}},
-            files: {{.FileData | toJSON}}
-            {{if .Stats.BranchData}},
-            branchData: {{.Stats.BranchData | toJSON}}
-            {{end}}
+            hourly: {{.HourlyData | toJSON }},
+            daily: {{.DailyData | toJSON }},
+            timeline: {{.CommitTimeline | toJSON }},
+            files: {{.FileData | toJSON }}
+        {{ if .Stats.BranchData}},
+        branchData: {{.Stats.BranchData | toJSON }}
+        {{ end }}
         };
         console.log('Report data:', reportData);
-        
+
         // 初始化图表
         initCharts(reportData);
-        
+
         // 初始化文件条形图百分比
         initFileBarChart();
-        
-        {{if .Stats.BranchData}}
+
+        {{ if .Stats.BranchData}}
         // 初始化提交森林图
         initCommitForest(reportData.branchData);
-        {{end}}
+        {{ end }}
 
         // 初始化文件条形图百分比显示
         function initFileBarChart() {
             const fileBars = document.querySelectorAll('.file-bar-fill');
             let maxCount = 0;
-            
+
             // 找到最大值
             fileBars.forEach(bar => {
                 const count = parseInt(bar.getAttribute('data-count'));
                 maxCount = Math.max(maxCount, count);
             });
-            
+
             // 设置宽度百分比
             fileBars.forEach(bar => {
                 const count = parseInt(bar.getAttribute('data-count'));
@@ -810,7 +848,7 @@
         function toggleMobileMenu() {
             const sidebar = document.querySelector('.sidebar-floating');
             sidebar.classList.toggle('mobile-open');
-            
+
             // 添加点击外部关闭菜单功能
             if (sidebar.classList.contains('mobile-open')) {
                 document.addEventListener('click', closeMobileMenuOnOutsideClick);
@@ -822,7 +860,7 @@
         function closeMobileMenuOnOutsideClick(event) {
             const sidebar = document.querySelector('.sidebar-floating');
             const toggleButton = document.querySelector('.mobile-menu-toggle');
-            
+
             if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
                 sidebar.classList.remove('mobile-open');
                 document.removeEventListener('click', closeMobileMenuOnOutsideClick);
@@ -830,7 +868,7 @@
         }
 
         // 侧边栏菜单功能
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const menuItems = document.querySelectorAll('.menu-item');
             const sections = document.querySelectorAll('.content-section');
 
@@ -857,7 +895,7 @@
 
             // 点击菜单项时滚动到对应section
             menuItems.forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function () {
                     if (this.classList.contains('disabled')) {
                         return;
                     }
@@ -897,4 +935,5 @@
         });
     </script>
 </body>
+
 </html>

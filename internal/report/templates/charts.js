@@ -227,7 +227,7 @@ function initCharts(data) {
     // Daily chart
     const dailyCtx = document.getElementById('dailyChart');
     if (dailyCtx && data.daily.length > 0) {
-        new Chart(dailyCtx, {
+        const dailyChart = new Chart(dailyCtx, {
             type: 'polarArea',
             data: {
                 labels: data.daily.map(d => d.Day),

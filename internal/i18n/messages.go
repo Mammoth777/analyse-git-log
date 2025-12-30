@@ -46,6 +46,8 @@ type Messages struct {
 	AIPromptTemplate        string
 	AISystemMessage         string
 	AIAnalysisTitle         string
+	AIKnowledgeBasePromptTemplate string
+	AIKnowledgeBaseSystemMessage string
 }
 
 // translations contains all language translations
@@ -96,6 +98,30 @@ var translations = map[Language]*Messages{
 
 		AISystemMessage: "你是一位专业的软件开发分析师。请分析Git仓库数据并提供可行的见解。请用中文回答。",
 		AIAnalysisTitle: "智能分析",
+		AIKnowledgeBasePromptTemplate: `请分析以下知识库项目的统计数据并提供见解：
+
+基础统计:
+%s
+
+详细数据:
+- 总编辑次数（文档更新）: %d
+- 编辑者数量: %d
+- 活跃周期: %s 到 %s
+- 活跃天数: %d
+
+请提供:
+1. 知识库更新模式分析（内容热点和更新频率）
+2. 编辑团队协作分布（谁在维护哪些部分）
+3. 文档热点领域识别（最常修改的主题）
+4. 知识库成熟度评估（内容完整度和稳定性）
+5. 内容组织优化建议（改进知识库结构的建议）
+
+特别关注：
+- 文档质量和更新频率
+- 内容的专业化和组织性
+- 编辑团队的协作模式
+- 需要补充或重写的内容领域`,
+		AIKnowledgeBaseSystemMessage: "你是一位知识管理和文档架构专家。请分析知识库项目的编辑数据，重点关注文档的组织、更新频率、内容热点和知识结构的优化。提供实际可行的改进建议。请用中文回答。",
 	},
 	
 	LangEN: {
@@ -144,6 +170,30 @@ Focus on actionable insights that can help improve the development process.`,
 
 		AISystemMessage: "You are an expert software development analyst. Analyze git repository data and provide actionable insights.",
 		AIAnalysisTitle: "Intelligent Analysis",
+		AIKnowledgeBasePromptTemplate: `Please analyze the following knowledge base project statistics and provide insights:
+
+BASIC STATISTICS:
+%s
+
+DETAILED DATA:
+- Total document edits: %d
+- Number of editors: %d
+- Active period: %s to %s
+- Active days: %d
+
+Please provide:
+1. Knowledge base update patterns analysis (content hotspots and update frequency)
+2. Editor team collaboration distribution (who maintains which sections)
+3. Document hotspot identification (most frequently modified topics)
+4. Knowledge base maturity assessment (content completeness and stability)
+5. Content organization optimization recommendations
+
+Special focus on:
+- Document quality and update frequency
+- Content professionalization and organization
+- Editor team collaboration patterns
+- Content areas needing supplements or rewriting`,
+		AIKnowledgeBaseSystemMessage: "You are a knowledge management and documentation architecture expert. Analyze knowledge base project editor data, focusing on document organization, update frequency, content hotspots, and knowledge structure optimization. Provide practical and actionable improvement recommendations.",
 	},
 }
 

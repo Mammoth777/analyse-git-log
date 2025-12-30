@@ -177,7 +177,7 @@
                 <h3>{{.Messages.MostModifiedFiles}}</h3>
                 <div class="files-list">
                     {{range .FileData}}
-                    <div class="file-bar">
+                    <div class="file-bar" title="{{.Name}}">
                         <div class="file-bar-fill" data-count="{{.Count}}">
                             <span class="file-name">{{.Name}}</span>
                         </div>

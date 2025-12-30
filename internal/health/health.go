@@ -10,6 +10,65 @@ import (
 	"git-log-analyzer/internal/git"
 )
 
+// fixEncodedString fixes strings that have been incorrectly encoded with octal escapes
+func fixEncodedString(s string) string {
+	// Check if string contains patterns like \NNN (octal escapes)
+	if !strings.Contains(s, "\\") {
+		return s
+	}
+	
+	// Try to recover from octal-encoded UTF-8
+	var decoded strings.Builder
+	i := 0
+	for i < len(s) {
+		if s[i] == '\\' && i+3 < len(s) {
+			// Try to parse as octal
+			octalStr := s[i+1 : i+4]
+			if octalStr[0] >= '0' && octalStr[0] <= '7' &&
+				octalStr[1] >= '0' && octalStr[1] <= '7' &&
+				octalStr[2] >= '0' && octalStr[2] <= '7' {
+			
+				var byte1 int
+				fmt.Sscanf(octalStr, "%o", &byte1)
+				
+				if byte1 >= 0 && byte1 <= 255 {
+					// Collect UTF-8 sequence
+					bytes := []byte{byte(byte1)}
+					i += 4
+					
+					// Collect additional bytes if this is a multi-byte UTF-8 sequence
+					for i < len(s) && s[i] == '\\' && i+3 < len(s) {
+						octalStr := s[i+1 : i+4]
+						if octalStr[0] >= '0' && octalStr[0] <= '7' &&
+							octalStr[1] >= '0' && octalStr[1] <= '7' &&
+							octalStr[2] >= '0' && octalStr[2] <= '7' {
+							var nextByte int
+							fmt.Sscanf(octalStr, "%o", &nextByte)
+							if nextByte >= 128 && nextByte <= 255 {
+								bytes = append(bytes, byte(nextByte))
+								i += 4
+							} else {
+								break
+							}
+						} else {
+							break
+						}
+					}
+					
+					// Decode UTF-8 bytes
+					decoded.WriteString(string(bytes))
+					continue
+				}
+			}
+		}
+		
+		decoded.WriteByte(s[i])
+		i++
+	}
+	
+	return decoded.String()
+}
+
 // CodeHealthAnalyzer performs code health analysis
 type CodeHealthAnalyzer struct {
 	commits []git.GitCommit
@@ -146,7 +205,7 @@ func (cha *CodeHealthAnalyzer) analyzeTechnicalDebtHotspots() []TechnicalDebtHot
 		
 		if riskScore > 0.3 { // 只包含风险分数较高的文件
 			hotspots = append(hotspots, TechnicalDebtHotspot{
-				FilePath:         stat.FilePath,
+				FilePath:         fixEncodedString(stat.FilePath),
 				ModificationFreq: stat.Changes,
 				UniqueAuthors:    len(stat.Authors),
 				TotalChanges:     stat.Changes,
@@ -206,7 +265,7 @@ func (cha *CodeHealthAnalyzer) analyzeStabilityIndicators() []StabilityIndicator
 		stabilityLevel := cha.getStabilityLevel(shakeIndex, timeSpread, modGap)
 		
 		indicators = append(indicators, StabilityIndicator{
-			FilePath:        filePath,
+			FilePath:        fixEncodedString(filePath),
 			ShakeIndex:      shakeIndex,
 			TimeSpread:      timeSpread,
 			ModificationGap: modGap,
@@ -260,7 +319,7 @@ func (cha *CodeHealthAnalyzer) analyzeRefactoringSignals() []RefactoringSignal {
 			signalStrength := cha.getRefactoringSignalStrength(len(changes), intensiveDays)
 			
 			signals = append(signals, RefactoringSignal{
-				FilePath:          filePath,
+				FilePath:          fixEncodedString(filePath),
 				IntensiveModDays:  intensiveDays,
 				ShortTermChanges:  len(changes),
 				RefactoringSignal: signalStrength,
@@ -312,7 +371,7 @@ func (cha *CodeHealthAnalyzer) analyzeCodeConcentration() []CodeConcentrationIss
 			impactLevel := cha.getImpactLevel(stat.Changes, len(stat.Authors))
 			
 			issues = append(issues, CodeConcentrationIssue{
-				FilePath:           stat.FilePath,
+				FilePath:           fixEncodedString(stat.FilePath),
 				TotalChanges:       stat.Changes,
 				AuthorCount:        len(stat.Authors),
 				ChangeRatio:        changeRatio,

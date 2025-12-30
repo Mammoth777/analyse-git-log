@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"git-log-analyzer/internal/analyzer"
@@ -123,12 +124,27 @@ func ValidateConfig(config AIConfig) error {
 func (c *AIClient) AnalyzeWithAI(stats *analyzer.Statistics, basicReport string) (string, error) {
 	prompt := c.buildAnalysisPrompt(stats, basicReport)
 	// log.Println("AI analysis request with prompt:", prompt)
-	return c.sendChatRequest(prompt)
+	isKnowledgeBase := c.detectKnowledgeBaseProject(stats)
+	return c.sendChatRequest(prompt, isKnowledgeBase)
 }
 
 // buildAnalysisPrompt creates a prompt for AI analysis
 func (c *AIClient) buildAnalysisPrompt(stats *analyzer.Statistics, basicReport string) string {
 	msg := i18n.T()
+	
+	// Detect if this is a knowledge base project
+	isKnowledgeBase := c.detectKnowledgeBaseProject(stats)
+	
+	if isKnowledgeBase {
+		prompt := fmt.Sprintf(msg.AIKnowledgeBasePromptTemplate,
+			basicReport,
+			stats.TotalCommits,
+			len(stats.AuthorStats),
+			stats.TimeStats.FirstCommit.Format("2006-01-02"),
+			stats.TimeStats.LastCommit.Format("2006-01-02"),
+			stats.TimeStats.ActiveDays)
+		return prompt
+	}
 	
 	prompt := fmt.Sprintf(msg.AIPromptTemplate,
 		basicReport,
@@ -141,9 +157,59 @@ func (c *AIClient) buildAnalysisPrompt(stats *analyzer.Statistics, basicReport s
 	return prompt
 }
 
+// detectKnowledgeBaseProject detects if the repository is a knowledge base project
+func (c *AIClient) detectKnowledgeBaseProject(stats *analyzer.Statistics) bool {
+	if stats == nil || stats.FileStats == nil {
+		return false
+	}
+	
+	// Count file types
+	mdCount := 0
+	codeFileCount := 0
+	totalFiles := len(stats.FileStats)
+	
+	codeExtensions := map[string]bool{
+		".go": true, ".java": true, ".py": true, ".js": true, ".ts": true,
+		".cpp": true, ".c": true, ".h": true, ".rs": true, ".rb": true,
+		".php": true, ".swift": true, ".kt": true, ".cs": true, ".vb": true,
+		".scala": true, ".clj": true, ".r": true, ".lua": true, ".sh": true,
+	}
+	
+	for file := range stats.FileStats {
+		if strings.HasSuffix(file, ".md") {
+			mdCount++
+		}
+		for ext := range codeExtensions {
+			if strings.HasSuffix(file, ext) {
+				codeFileCount++
+				break
+			}
+		}
+	}
+	
+	// Knowledge base indicators:
+	// - High ratio of markdown files (>50%)
+	// - Few code files (<20% of total)
+	// - Total files suggest documentation structure
+	if totalFiles > 10 {
+		mdRatio := float64(mdCount) / float64(totalFiles)
+		codeRatio := float64(codeFileCount) / float64(totalFiles)
+		
+		// If markdown files dominate and code files are minimal, it's likely a knowledge base
+		return mdRatio > 0.5 && codeRatio < 0.2
+	}
+	
+	return false
+}
+
 // sendChatRequest sends a request to the AI chat API
-func (c *AIClient) sendChatRequest(prompt string) (string, error) {
+func (c *AIClient) sendChatRequest(prompt string, isKnowledgeBase bool) (string, error) {
 	msg := i18n.T()
+	
+	systemMessage := msg.AISystemMessage
+	if isKnowledgeBase {
+		systemMessage = msg.AIKnowledgeBaseSystemMessage
+	}
 	
 	client := openai.NewClient(
 		option.WithAPIKey(os.Getenv("AI_API_KEY")),
@@ -153,7 +219,7 @@ func (c *AIClient) sendChatRequest(prompt string) (string, error) {
 		context.TODO(), 
 		openai.ChatCompletionNewParams{
 			Messages: []openai.ChatCompletionMessageParamUnion{
-				openai.SystemMessage(msg.AISystemMessage),
+				openai.SystemMessage(systemMessage),
 				openai.UserMessage(prompt),
 			},
 			Model: "qwen-plus",

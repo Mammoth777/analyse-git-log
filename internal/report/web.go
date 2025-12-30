@@ -220,7 +220,7 @@ func (w *WebReportGenerator) prepareReportData(stats *analyzer.Statistics, aiAna
 			break
 		}
 		data.FileData = append(data.FileData, FileData{
-			Name:  f.file,
+			Name:  fixEncodedString(f.file),
 			Count: f.count,
 		})
 	}
@@ -397,7 +397,79 @@ func sanitizeFilename(name string) string {
 	result = strings.ReplaceAll(result, "<", "-")
 	result = strings.ReplaceAll(result, ">", "-")
 	result = strings.ReplaceAll(result, "|", "-")
-	return result
+	
+	// Replace non-ASCII characters (Chinese, etc.) with dashes to avoid encoding issues
+	var filtered strings.Builder
+	for _, r := range result {
+		if r >= 0 && r <= 127 {
+			filtered.WriteRune(r)
+		} else {
+			filtered.WriteRune('-')
+		}
+	}
+	return filtered.String()
+}
+
+// fixEncodedString fixes strings that have been incorrectly encoded with octal escapes
+func fixEncodedString(s string) string {
+	// Check if string contains patterns like \NNN (octal escapes)
+	// These appear as literal backslash + numbers in the string
+	if !strings.Contains(s, "\\") {
+		return s
+	}
+	
+	// Try to recover from octal-encoded UTF-8
+	result := s
+	// Replace \NNN patterns by attempting to decode them as UTF-8 bytes
+	var decoded strings.Builder
+	i := 0
+	for i < len(result) {
+		if result[i] == '\\' && i+3 < len(result) {
+			// Try to parse as octal
+			octalStr := result[i+1 : i+4]
+			if octalStr[0] >= '0' && octalStr[0] <= '7' &&
+				octalStr[1] >= '0' && octalStr[1] <= '7' &&
+				octalStr[2] >= '0' && octalStr[2] <= '7' {
+				
+				var byte1 int
+				fmt.Sscanf(octalStr, "%o", &byte1)
+				
+				if byte1 >= 0 && byte1 <= 255 {
+					// Collect UTF-8 sequence
+					bytes := []byte{byte(byte1)}
+					i += 4
+					
+					// Collect additional bytes if this is a multi-byte UTF-8 sequence
+					for i < len(result) && result[i] == '\\' && i+3 < len(result) {
+						octalStr := result[i+1 : i+4]
+						if octalStr[0] >= '0' && octalStr[0] <= '7' &&
+							octalStr[1] >= '0' && octalStr[1] <= '7' &&
+							octalStr[2] >= '0' && octalStr[2] <= '7' {
+							var nextByte int
+							fmt.Sscanf(octalStr, "%o", &nextByte)
+							if nextByte >= 128 && nextByte <= 255 {
+								bytes = append(bytes, byte(nextByte))
+								i += 4
+							} else {
+								break
+							}
+						} else {
+							break
+						}
+					}
+					
+					// Decode UTF-8 bytes
+					decoded.WriteString(string(bytes))
+					continue
+				}
+			}
+		}
+		
+		decoded.WriteByte(result[i])
+		i++
+	}
+	
+	return decoded.String()
 }
 
 // generateCSS generates the CSS file for the report

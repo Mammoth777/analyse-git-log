@@ -2629,3 +2629,119 @@ html {
 #branchFilterInput::placeholder {
   color: #999; /* 你想要的颜色 */
 }
+
+.ai-analysis-rendered {
+    padding: 10px 40px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+        border-radius: 12px;
+        border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.ai-analysis-rendered h1,
+.ai-analysis-rendered h2,
+.ai-analysis-rendered h3,
+.ai-analysis-rendered h4,
+.ai-analysis-rendered h5,
+.ai-analysis-rendered h6 {
+    color: #1f2937;
+    margin: 20px 0 12px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.ai-analysis-rendered h1 { font-size: 1.8em; }
+.ai-analysis-rendered h2 { font-size: 1.5em; }
+.ai-analysis-rendered h3 { font-size: 1.2em; }
+
+.ai-analysis-rendered p {
+    color: #4b5563;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    font-size: 1em;
+}
+
+.ai-analysis-rendered ul,
+.ai-analysis-rendered ol {
+    margin: 16px 0;
+    padding-left: 28px;
+    color: #4b5563;
+}
+
+.ai-analysis-rendered li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.ai-analysis-rendered code {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9em;
+}
+
+.ai-analysis-rendered pre {
+    background: #f8fafc;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 16px 0;
+}
+
+.ai-analysis-rendered pre code {
+    background: none;
+    color: #374151;
+    padding: 0;
+}
+
+.ai-analysis-rendered strong {
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.ai-analysis-rendered blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 16px;
+    margin: 16px 0;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.ai-analysis-rendered a {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.ai-analysis-rendered a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.ai-analysis-rendered table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+}
+
+.ai-analysis-rendered th {
+    background: rgba(59, 130, 246, 0.1);
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+.ai-analysis-rendered td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.ai-analysis-rendered hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+    margin: 24px 0;
+}

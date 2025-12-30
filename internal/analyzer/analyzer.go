@@ -11,6 +11,65 @@ import (
 	"git-log-analyzer/internal/i18n"
 )
 
+// fixEncodedString fixes strings that have been incorrectly encoded with octal escapes
+func fixEncodedString(s string) string {
+	// Check if string contains patterns like \NNN (octal escapes)
+	if !strings.Contains(s, "\\") {
+		return s
+	}
+	
+	// Try to recover from octal-encoded UTF-8
+	var decoded strings.Builder
+	i := 0
+	for i < len(s) {
+		if s[i] == '\\' && i+3 < len(s) {
+			// Try to parse as octal
+			octalStr := s[i+1 : i+4]
+			if octalStr[0] >= '0' && octalStr[0] <= '7' &&
+				octalStr[1] >= '0' && octalStr[1] <= '7' &&
+				octalStr[2] >= '0' && octalStr[2] <= '7' {
+			
+				var byte1 int
+				fmt.Sscanf(octalStr, "%o", &byte1)
+				
+				if byte1 >= 0 && byte1 <= 255 {
+					// Collect UTF-8 sequence
+					bytes := []byte{byte(byte1)}
+					i += 4
+					
+					// Collect additional bytes if this is a multi-byte UTF-8 sequence
+					for i < len(s) && s[i] == '\\' && i+3 < len(s) {
+						octalStr := s[i+1 : i+4]
+						if octalStr[0] >= '0' && octalStr[0] <= '7' &&
+							octalStr[1] >= '0' && octalStr[1] <= '7' &&
+							octalStr[2] >= '0' && octalStr[2] <= '7' {
+							var nextByte int
+							fmt.Sscanf(octalStr, "%o", &nextByte)
+							if nextByte >= 128 && nextByte <= 255 {
+								bytes = append(bytes, byte(nextByte))
+								i += 4
+							} else {
+								break
+							}
+						} else {
+							break
+						}
+					}
+					
+					// Decode UTF-8 bytes
+					decoded.WriteString(string(bytes))
+					continue
+				}
+			}
+		}
+		
+		decoded.WriteByte(s[i])
+		i++
+	}
+	
+	return decoded.String()
+}
+
 // Statistics contains analysis results
 type Statistics struct {
 	TotalCommits     int
@@ -261,10 +320,11 @@ func (a *Analyzer) processCommitMetadata(commit *git.GitCommit, stats *Statistic
 		authorStat.Additions += commit.Additions
 		authorStat.Deletions += commit.Deletions
 
-		// Update file statistics
+		// Update file statistics (fix encoding issues)
 		for _, file := range commit.Files {
-			stats.FileStats[file]++
-			authorStat.Files[file]++
+			fixedFile := fixEncodedString(file)
+			stats.FileStats[fixedFile]++
+			authorStat.Files[fixedFile]++
 		}
 	}
 

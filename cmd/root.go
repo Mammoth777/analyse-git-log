@@ -58,6 +58,8 @@ Environment variables for report customization:
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() error {
+	sayHi := getEnv("SAY_HI", "Hi there!") // Just to demonstrate loading .env
+	fmt.Println(sayHi)
 	return rootCmd.Execute()
 }
 
